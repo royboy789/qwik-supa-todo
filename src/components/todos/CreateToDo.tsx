@@ -63,7 +63,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
           </label>
           <textarea
             name="todo_description"
-            class="w-full"
+            class="w-full text-xl h-28 focus:h-[300px] transition-all"
             placeholder="Context & Notes"
             value={task.description}
             onChange$={(e) => {
