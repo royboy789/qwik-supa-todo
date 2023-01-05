@@ -4,18 +4,18 @@ const SignIn = component$(() => {
   const user = useStore({ email: "" });
   const sent = useSignal(false);
   const initSignIn = $(async () => {
+    sent.value = true;
     // send magiclink
     await fetch(`/auth/login`, {
       method: "POST",
       body: JSON.stringify({ user: { ...user } }),
     });
-    sent.value = true;
   });
 
   return (
     <div>
-      {sent ? (
-        <div>Sent a magic link to your email, use it.</div>
+      {sent.value ? (
+        <div>Sending a magic link to your email, use it.</div>
       ) : (
         <form
           preventdefault:submit
