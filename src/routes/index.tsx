@@ -34,7 +34,7 @@ export default component$(() => {
 
     // new task
     if (-1 === editingIndex) {
-      if(!auth.user) {
+      if(!auth.user || !client) {
         toDoState.tasks = [...toDoState.tasks, ...[task]];
         return task;
       }
@@ -50,11 +50,12 @@ export default component$(() => {
     tasksCopy[editingIndex] = { ...task };
 
     toDoState.tasks = [...tasksCopy];
-    if(!auth.user) {
+    if(!auth.user || !client) {
       return task;
     }
 
     await editTask(client, task);
+    return task;
   });
 
   // Complete Task
@@ -88,18 +89,23 @@ export default component$(() => {
 
   // Delete Task
   const initDelete = $(async (task: Task) => {
-    if (!task.task_id) {
+    const client = await supabase.client$();
+    if (!task.task_id || !client) {
       return task;
     }
     // filter deleted out
     toDoState.tasks = toDoState.tasks.filter((tsk) => tsk.task_id !== task.task_id);
-    await deleteTask(await supabase.client$(), task);
+    await deleteTask(client, task);
     return task;
   });
 
   // signOut
   const initSignOut = $(async() => {
     const client = await supabase.client$();
+    if (!client) {
+      return;
+    }
+
     await client.auth.signOut();
 
     document.cookie = `access_token=; path=/`;

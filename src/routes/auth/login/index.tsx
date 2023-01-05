@@ -14,7 +14,7 @@ export const onPost: RequestHandler<any> = async({params, request}) => {
     const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: 'http://localhost:5173/auth/callback'
+          emailRedirectTo: import.meta.env.VITE_URL
         }
       })
 

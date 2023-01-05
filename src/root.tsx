@@ -9,10 +9,10 @@ import globalStyles from './global.css?inline';
 import { RouterHead } from '~/components/router-head/router-head';
 
 // supabase client
-export const supabaseClient = createClient(
+export const supabaseClient = import.meta.env.VITE_SUPABASE_URL ? createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+) : false;
 
 
 
@@ -26,6 +26,9 @@ export default component$(() => {
   useClientEffect$(async({track}) => {
     track(() => supaContext);
     const client = await supaContext.client$();
+    if(!client) {
+      return;
+    }
     
     // get session from supa
     const { data: userSession, error } = await client.auth.getSession();

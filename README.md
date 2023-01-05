@@ -6,9 +6,11 @@ Another way to manage to do's across JIRAs, Google Docs/Sheets, etc.
 * [Supabase](supabase.com)
 
 ## Configuration
-If you want to use Supabase too, create a `.env` file with:
-* VITE_SUPABASE_ANON_KEY
-* VITE_SUPABASE_URL
+You'll need to create a `.env` file with:
+* VITE_URL = URL the site is being served
+* VITE_SUPABASE_ANON_KEY = Supabase Anon Key (for use with Supabase)
+* VITE_SUPABASE_URL = Supabase API URL (for use with Supabase)
+
 
   
 # Running

@@ -4,7 +4,7 @@ import { SupabaseClient, User } from "@supabase/supabase-js";
 const supabaseContextName = 'authContext';
 
 export interface SupaContextProps {
-    client$: QRL<() => SupabaseClient>;
+    client$: QRL<() => SupabaseClient|false>;
     user: User | false;
 }
 

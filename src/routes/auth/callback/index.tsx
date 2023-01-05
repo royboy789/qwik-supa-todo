@@ -6,6 +6,9 @@ export default component$(() => {
 
   useClientEffect$(async () => {
     const client = await supabase.client$();
+    if(!client) {
+      return;
+    }
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);
 
