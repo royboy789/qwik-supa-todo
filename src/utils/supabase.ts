@@ -31,7 +31,6 @@ export const insertTask: QRL<
     console.error(error.message);
     return task;
   }
-  console.log(data);
 
   return data ? data[0] : task;
 });
@@ -50,22 +49,22 @@ export const editTask: QRL<
       name: task.name,
     })
     .eq("task_id", task.task_id)
-    .select('*');
+    .select("*");
   if (error) {
     console.error(error.message);
     return task;
   }
-  console.log(data);
 
   return data ? data[0] : task;
 });
 
-
 /**
  * Edit Task
  */
-export const deleteTask: QRL<(client: SupabaseClient, task: Task) => Promise<void>> = $(async (client, task) => {
-  const { data, error } = await client
+export const deleteTask: QRL<
+  (client: SupabaseClient, task: Task) => Promise<void>
+> = $(async (client, task) => {
+  const { error } = await client
     .from("tasks")
     .delete()
     .eq("task_id", task.task_id);
@@ -73,7 +72,32 @@ export const deleteTask: QRL<(client: SupabaseClient, task: Task) => Promise<voi
     console.error(error.message);
     return;
   }
-  console.log(data);
+  return;
+});
+
+/**
+ * Complete Task
+ */
+export const completeTask: QRL<
+  (
+    client: SupabaseClient,
+    task_id: string,
+    isComplete: boolean
+  ) => Promise<void>
+> = $(async (client, task_id, isComplete) => {
+  const { error } = await client
+    .from("tasks")
+    .update({
+      completed: isComplete,
+      completed_on: isComplete ? new Date().toISOString() : null,
+    } as Task)
+    .eq("task_id", task_id)
+    .select("*");
+
+  if (error) {
+    console.error(error.message);
+    return;
+  }
 
   return;
 });

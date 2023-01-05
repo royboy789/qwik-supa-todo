@@ -30,11 +30,10 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
   });
 
   const { task } = taskStore;
-
   return (
     <div
-      class={`relative transition-all duration-500 overflow-hidden border-b-8 border-gray-300 ${
-        !active.value ? `h-10` : `h-[650px]`
+      class={`relative transition-all duration-500 border-b-2 border-gray-200 ${
+        !active.value ? `h-14 overflow-hidden` : `h-[650px] pb-20 overflow-auto`
       }`}
     >
       <form
@@ -44,6 +43,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
       >
         <div class="pb-5 space-x-2">
           <button
+            class="border-2 border-sky-200 hover:border-sky-400 py-2 px-4"
             onClick$={() => {
               active.value = true;
             }}
@@ -82,22 +82,44 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
           />
         </div>
         <div class="grid grid-cols-6 gap-5">
-          <label for="todo_link" class="leading-10 col-span-2">
-            Helpful Link:
-          </label>
-          <input
-            class="col-span-4"
-            type="text"
-            name="todo_link"
-            placeholder="Where do I do it? Or more context?"
-            value={task.link}
-            onChange$={(e) => {
-              taskStore.task = {
-                ...task,
-                link: [(e.target as HTMLInputElement).value],
-              };
-            }}
-          />
+          <div class="col-span-2">
+            <label for="todo_link" class="leading-10">
+              Helpful Links
+            </label>
+            <button
+              type="button"
+              class="inline-block ml-2 border-2 border-sky-200 hover:border-sky-400 text-xs py-1 px-3"
+              onClick$={() => {
+                taskStore.task = {
+                  ...task,
+                  link: task.link ? [...task.link, ...[""]] : [""],
+                };
+              }}
+            >
+              + link
+            </button>
+          </div>
+          <divm class="col-span-4">
+            {task.link && task.link.map((link, i) => {
+              return (
+                <input
+                  class="w-full mb-2"
+                  type="text"
+                  name="todo_link"
+                  placeholder="Where do I do it? Or more context?"
+                  value={link}
+                  onChange$={(e) => {
+                    const linkCopy = task.link || [];
+                    linkCopy[i] = (e.target as HTMLInputElement).value;
+                    taskStore.task = {
+                      ...task,
+                      link: [...linkCopy]
+                    };
+                  }}
+                />
+              );
+            })}
+          </divm>
         </div>
         <div class="text-center">
           <label for="todo_description" class="block leading-10">
@@ -125,7 +147,11 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
               onClick$={async () => {
                 taskStore.task = {
                   ...task,
-                  task_id: task.task_id && task.task_id !== "" ? task.task_id : uuidv4(),
+                  link: task.link?.filter((href) => href !== ''),
+                  task_id:
+                    task.task_id && task.task_id !== ""
+                      ? task.task_id
+                      : uuidv4(),
                 };
                 await createToDo(taskStore.task);
                 active.value = false;

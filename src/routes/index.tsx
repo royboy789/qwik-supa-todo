@@ -5,7 +5,7 @@ import { Task, todoContext } from "~/state/todoContext";
 
 import { supabaseContext } from "~/state/supabase";
 
-import { insertTask, editTask, deleteTask } from "~/utils/supabase";
+import { insertTask, editTask, deleteTask, completeTask } from "~/utils/supabase";
 
 // Components
 import SignIn from "~/components/auth/SignIn";
@@ -59,7 +59,9 @@ export default component$(() => {
   });
 
   // Complete Task
-  const completeTask = $((task_id: string, checked: boolean) => {
+  const completeTaskInit = $(async(task_id: string, checked: boolean) => {
+    const client = await supabase.client$();
+
     const editingIndex = toDoState.tasks.findIndex(
       (tsk) => tsk.task_id === task_id
     );
@@ -69,6 +71,10 @@ export default component$(() => {
       tasksCopy[editingIndex].completed_on = new Date().getTime().toString();
     }
     toDoState.tasks = [...tasksCopy];
+
+    if(client && auth.user) {
+      completeTask(client, task_id, checked);
+    }
 
     return toDoState.tasks[editingIndex];
   });
@@ -141,7 +147,7 @@ export default component$(() => {
         editTask={initEdit}
         copyTask={initCopy}
         deleteTask={initDelete}
-        completeTask={completeTask}
+        completeTask={completeTaskInit}
       />
     </div>
   );

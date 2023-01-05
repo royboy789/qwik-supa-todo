@@ -28,6 +28,7 @@ export default component$(() => {
       created_on: new Date().toISOString(),
       task_id: "",
       user_id: "",
+      link: ['']
     } as Task,
   });
 

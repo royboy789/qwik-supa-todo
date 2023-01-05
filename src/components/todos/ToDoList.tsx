@@ -36,7 +36,7 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
                   aria-describedby="comments-description"
                   name={`task-${task.task_id}`}
                   type="checkbox"
-                  class="h-8 w-8 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
+                  class="h-8 w-8 rounded border-gray-300 text-sky-600 focus:ring-sky-500 cursor-pointer"
                   checked={task.completed || false}
                   onChange$={(e) => {
                     completeTask(task.task_id, (e.target as HTMLInputElement).checked);
