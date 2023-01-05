@@ -26,43 +26,43 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
       {tasks.length > 0 && (
         <h1 class="relative text-center text-5xl my-10">Your Tasks</h1>
       )}
-      {tasks.map((task) => {
+      {tasks.length > 0 && tasks.map((task) => {
         return (
           <div class="relative grid grid-cols-6 p-5 hover:bg-gray-100">
-            <div class="col-span-4 px-5 text-sm flex gap-5 cursor-pointer" onClick$={() => completeTask(task.uuid, !task.completed)}>
+            <div class="col-span-4 px-5 text-sm flex gap-5 cursor-pointer" onClick$={() => completeTask(task.task_id, !task.completed)}>
               <div class="items-centet h-full flex items-center justify-center">
                 <input
-                  id={`task-${task.uuid}`}
+                  id={`task-${task.task_id}`}
                   aria-describedby="comments-description"
-                  name={`task-${task.uuid}`}
+                  name={`task-${task.task_id}`}
                   type="checkbox"
                   class="h-8 w-8 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
                   checked={task.completed || false}
                   onChange$={(e) => {
-                    completeTask(task.uuid, (e.target as HTMLInputElement).checked);
+                    completeTask(task.task_id, (e.target as HTMLInputElement).checked);
                   }}
                 />
               </div>
               <div>
                 <label
-                  for={`task-${task.uuid}`}
+                  for={`task-${task.task_id}`}
                   class="text-xl font-medium text-gray-700 cursor-pointer"
                 >
                   {task.name}
                 </label>
                 <p id="comments-description" class="text-gray-500">
                   {task.description}
-                  {task.link && (
+                  {task.link && task.link.length > 0 && task.link.map((href) => (
                     <a
                       class="block text-sky-600"
-                      href={task.link}
+                      href={href}
                       target={"_blank"}
                     >
                       Helpful Link
                     </a>
-                  )}
+                  ))}
                 </p>
-                {task.completed && (
+                {task.completed && task.completed_on && (
                   <p class="text-gray-500 mt-5">
                     <em>Completed: {dateCompleted(task.completed_on)}</em>
                   </p>

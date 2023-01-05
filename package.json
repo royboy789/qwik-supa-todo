@@ -44,6 +44,10 @@
     "vite-tsconfig-paths": "3.5.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.2.3",
     "uuid": "^9.0.0"
+  },
+  "prettier": {
+    "printWidth": 280
   }
 }

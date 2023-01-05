@@ -4,6 +4,7 @@ import {
   useClientEffect$,
   useStore,
   useContextProvider,
+  useContext,
   useSignal,
 } from "@builder.io/qwik";
 import { isServer } from "@builder.io/qwik/build";
@@ -11,35 +12,56 @@ import Header from "../components/header/header";
 
 import type { Task, ToDoContext } from "~/state/todoContext";
 import { todoContext } from "~/state/todoContext";
+import { supabaseContext } from "~/state/supabase";
+
+import { getTasks } from "~/utils/supabase";
 
 export default component$(() => {
   const loaded = useSignal(false);
+  const supabase = useContext(supabaseContext);
   const taskStore: ToDoContext = useStore({
     tasks: [],
     editTask: {
       name: "",
       description: "",
       completed: false,
-      created: new Date().getTime().toString(),
-      uuid: '',
+      created_on: new Date().toISOString(),
+      task_id: "",
+      user_id: "",
     } as Task,
   });
 
-  useClientEffect$(({ track }) => {
+  useClientEffect$(async ({ track }) => {
     if (isServer) {
       return;
     }
     const tasks = track(() => taskStore.tasks);
-    if (!loaded.value) {
-      taskStore.tasks = JSON.parse(
-        window.localStorage.getItem("myTasks") || "[]"
-      );
-      loaded.value = true;
+    const client = await supabase.client$();
+
+    const { user } = supabase;
+
+    // edit task user
+    if("" === taskStore.editTask.user_id && user) {
+      taskStore.editTask = {...taskStore.editTask, user_id: user.id}
+    }
+
+    if (!loaded.value && tasks.length === 0) {
+      if (!user) {
+        const localTasks = JSON.parse(
+          window.localStorage.getItem("myTasks") || "[]"
+        );
+        taskStore.tasks = [...localTasks] || [];
+        loaded.value = true;
+        return;
+      }
+      const cloudTasks = await getTasks( client );
+      taskStore.tasks = [...cloudTasks];
       return;
     }
-    
-    if (tasks.length > 0) {
+
+    if (tasks.length > 0 && !user) {
       window.localStorage.setItem("myTasks", JSON.stringify(tasks));
+      return;
     }
   });
 

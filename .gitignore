@@ -1,4 +1,5 @@
 # Build
+.env
 /dist
 /lib
 /lib-types
