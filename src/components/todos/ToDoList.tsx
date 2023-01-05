@@ -7,9 +7,17 @@ interface ToDoListProps {
   editTask: QRL<(task: Task) => Promise<Task>>;
   copyTask: QRL<(task: Task) => Promise<Task>>;
   deleteTask: QRL<(task: Task) => Promise<Task>>;
+  completeTask: QRL<(task_id: string, checked: boolean) => Promise<Task>>;
 }
 
-const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteTask }) => {
+const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteTask, completeTask }) => {
+
+  const dateCompleted = (date: string) => {
+    const completedDate = new Date();
+    completedDate.setTime(parseInt(date));
+
+    return `${completedDate.getMonth()+1}/${completedDate.getDate()}/${completedDate.getFullYear()}`;
+  }
   return (
     <div class="tasks">
       {tasks.length === 0 && (
@@ -21,15 +29,18 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
       {tasks.map((task) => {
         return (
           <div class="relative grid grid-cols-6 p-5 hover:bg-gray-100">
-            <div class="col-span-4 px-5 text-sm flex gap-5">
+            <div class="col-span-4 px-5 text-sm flex gap-5 cursor-pointer" onClick$={() => completeTask(task.uuid, !task.completed)}>
               <div class="items-centet h-full flex items-center justify-center">
                 <input
                   id={`task-${task.uuid}`}
                   aria-describedby="comments-description"
                   name={`task-${task.uuid}`}
                   type="checkbox"
-                  class="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
+                  class="h-8 w-8 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
                   checked={task.completed || false}
+                  onChange$={(e) => {
+                    completeTask(task.uuid, (e.target as HTMLInputElement).checked);
+                  }}
                 />
               </div>
               <div>
@@ -51,6 +62,11 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
                     </a>
                   )}
                 </p>
+                {task.completed && (
+                  <p class="text-gray-500 mt-5">
+                    <em>Completed: {dateCompleted(task.completed_on)}</em>
+                  </p>
+                )}
               </div>
             </div>
             <div class="col-span-2 text-right ml-2 actions w-lg space-y-1 flex flex-col items-end">

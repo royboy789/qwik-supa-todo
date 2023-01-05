@@ -7,7 +7,7 @@ export type Task = {
     completed: boolean;
     completed_on?: string;
     created: string;
-    uuid?: string;
+    uuid: string;
 }
 
 export interface ToDoContext {

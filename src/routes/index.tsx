@@ -17,12 +17,10 @@ export default component$(() => {
     );
 
     if (-1 === editingIndex) {
-      console.log(`new task`);
       toDoState.tasks = [...toDoState.tasks, ...[task]];
       return task;
     }
 
-    console.log(`editing task: ${task.name} - ${editingIndex}`);
     const tasksCopy = [...toDoState.tasks];
     tasksCopy[editingIndex] = { ...task };
 
@@ -30,16 +28,29 @@ export default component$(() => {
     return task;
   });
 
+  // Complete Task
+  const completeTask = $((task_id: string, checked: boolean) => {
+    const editingIndex = toDoState.tasks.findIndex(
+      (tsk) => tsk.uuid === task_id
+    );
+    const tasksCopy = [...toDoState.tasks];
+    tasksCopy[editingIndex].completed = checked;
+    if(checked) {
+      tasksCopy[editingIndex].completed_on = new Date().getTime().toString();
+    }
+    toDoState.tasks = [...tasksCopy];
+
+    return toDoState.tasks[editingIndex];
+  });
+
   // Edit Task
   const initEdit = $((task: Task) => {
-    console.log(`editing: ${task.name}`);
     toDoState.editTask = { ...task };
     return task;
   });
 
   // Copy Task
   const initCopy = $((task: Task) => {
-    console.log(`copying: ${task.name}`);
     const editTask: Task = { ...task, uuid: "" };
     toDoState.editTask = { ...editTask };
     return task;
@@ -47,14 +58,10 @@ export default component$(() => {
 
   // Delete Task
   const initDelete = $((task: Task) => {
-    console.log(`deleteing ${task.uuid}`)
     if (!task.uuid) {
       return task;
     }
-    const deleteIndex = toDoState.tasks.findIndex(
-      (tsk) => tsk.uuid === task.uuid
-    );
-    console.log(deleteIndex);
+    // filter deleted out
     toDoState.tasks = toDoState.tasks.filter((tsk) => tsk.uuid !== task.uuid);
     return task;
   });
@@ -67,6 +74,7 @@ export default component$(() => {
         editTask={initEdit}
         copyTask={initCopy}
         deleteTask={initDelete}
+        completeTask={completeTask}
       />
     </div>
   );

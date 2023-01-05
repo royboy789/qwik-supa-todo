@@ -31,15 +31,13 @@ export default component$(() => {
     }
     const tasks = track(() => taskStore.tasks);
     if (!loaded.value) {
-      console.log("loading tasks");
       taskStore.tasks = JSON.parse(
         window.localStorage.getItem("myTasks") || "[]"
       );
       loaded.value = true;
       return;
     }
-    console.log("task change");
-    console.log(taskStore.tasks);
+    
     if (tasks.length > 0) {
       window.localStorage.setItem("myTasks", JSON.stringify(tasks));
     }
