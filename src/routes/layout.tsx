@@ -77,9 +77,11 @@ export default component$(() => {
       </main>
       <footer class="text-center">
         <span class="text-gray-400 italic">
-          Made with ♡ because I couldn't find a better solution that worked for
-          me
+          Made with <span class="text-red-500">♡</span> because I couldn't find a better solution that worked for me
         </span>
+        <a class="block text-sky-500 hover:underline mt-2d" target="_blank" href="https://github.com/royboy789/qwik-supa-todo">
+          GitHub Repo
+        </a>
       </footer>
     </>
   );
