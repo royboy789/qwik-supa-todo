@@ -38,7 +38,8 @@ The production build will generate client and server modules by running both cli
 npm run build # or `yarn build`
 ```
 
-## Cloudflare Pages
+
+# Cloudflare Pages
 
 Cloudflare's [wrangler](https://github.com/cloudflare/wrangler) CLI can be used to preview a production build locally. To start a local server, run:
 
