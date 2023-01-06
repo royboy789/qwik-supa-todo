@@ -1,5 +1,5 @@
 import { component$, QRL } from "@builder.io/qwik";
-
+import { Converter } from 'showdown';
 import { Task } from "~/state/todoContext";
 
 interface ToDoListProps {
@@ -11,7 +11,7 @@ interface ToDoListProps {
 }
 
 const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteTask, completeTask }) => {
-
+  const converter = new Converter();
   const dateCompleted = (date: string) => {
     const completedDate = new Date();
     completedDate.setTime(parseInt(date));
@@ -29,7 +29,7 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
       {tasks.length > 0 && tasks.map((task) => {
         return (
           <div class="relative grid sm:grid-cols-6 p-5 hover:bg-gray-100">
-            <div class="col-span-4 px-5 text-sm flex gap-5 cursor-pointer" onClick$={() => completeTask(task.task_id, !task.completed)}>
+            <div class="col-span-5 px-5 text-sm flex gap-5 cursor-pointer" onClick$={() => completeTask(task.task_id, !task.completed)}>
               <div class="items-centet h-full flex items-center justify-center">
                 <input
                   id={`task-${task.task_id}`}
@@ -43,20 +43,23 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
                   }}
                 />
               </div>
-              <div>
+              <div class="flex-grow">
                 <label
                   for={`task-${task.task_id}`}
                   class="text-xl font-medium text-gray-700 cursor-pointer"
                 >
                   {task.name}
                 </label>
-                <p id="comments-description" class="text-gray-500 sm:block hidden">
-                  {task.description}
+                {task.description && (
+                  <div id="task-description" class="text-gray-500 sm:block hidden leading-7 mb-2 max-h-48 overflow-auto" dangerouslySetInnerHTML={converter.makeHtml(task.description)}></div>
+                )}
+                <p>
                   {task.link && task.link.length > 0 && task.link.map((href) => (
                     <a
-                      class="block text-sky-600"
+                      class="inline-block mr-4 text-sky-600"
                       href={href}
                       target={"_blank"}
+                      title={href}
                     >
                       Helpful Link
                     </a>
@@ -69,7 +72,7 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
                 )}
               </div>
             </div>
-            <div class="sm:col-span-2 mt-5 sm:mt-0 w-full text-right ml-2 actions w-lg space-y-0 sm:space-y-1 space-x-5 sm:space-x-0 flex flex-row sm:flex sm:flex-col items-cneter justify-center sm:items-end">
+            <div class="mt-5 sm:mt-0 w-full text-right ml-2 actions w-lg space-y-0 sm:space-y-1 space-x-5 sm:space-x-0 flex flex-row sm:flex sm:flex-col items-cneter justify-center sm:items-end">
               <button class="block text-xs py-2 px-4 border-2 border-sky-500 hover:bg-sky-700 hover:text-white" onClick$={() => editTask(task)}>Edit</button>
               <button class="block text-xs py-2 px-4 border-2 border-sky-500 hover:bg-sky-700 hover:text-white" onClick$={() => copyTask(task)}>Copy</button>
               <button class="block text-xs py-2 px-4 border-2 border-red-500 hover:bg-red-700 hover:text-white" onClick$={() => deleteTask(task)}>Delete</button>

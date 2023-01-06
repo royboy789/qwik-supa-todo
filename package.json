@@ -47,6 +47,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.2.3",
+    "@types/showdown": "^2.0.0",
+    "showdown": "^2.1.0",
     "uuid": "^9.0.0"
   },
   "prettier": {
