@@ -28,7 +28,7 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
       )}
       {tasks.length > 0 && tasks.map((task) => {
         return (
-          <div class="relative grid grid-cols-6 p-5 hover:bg-gray-100">
+          <div class="relative grid sm:grid-cols-6 p-5 hover:bg-gray-100">
             <div class="col-span-4 px-5 text-sm flex gap-5 cursor-pointer" onClick$={() => completeTask(task.task_id, !task.completed)}>
               <div class="items-centet h-full flex items-center justify-center">
                 <input
@@ -50,7 +50,7 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
                 >
                   {task.name}
                 </label>
-                <p id="comments-description" class="text-gray-500">
+                <p id="comments-description" class="text-gray-500 sm:block hidden">
                   {task.description}
                   {task.link && task.link.length > 0 && task.link.map((href) => (
                     <a
@@ -69,7 +69,7 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
                 )}
               </div>
             </div>
-            <div class="col-span-2 text-right ml-2 actions w-lg space-y-1 flex flex-col items-end">
+            <div class="sm:col-span-2 mt-5 sm:mt-0 w-full text-right ml-2 actions w-lg space-y-0 sm:space-y-1 space-x-5 sm:space-x-0 flex flex-row sm:flex sm:flex-col items-cneter justify-center sm:items-end">
               <button class="block text-xs py-2 px-4 border-2 border-sky-500 hover:bg-sky-700 hover:text-white" onClick$={() => editTask(task)}>Edit</button>
               <button class="block text-xs py-2 px-4 border-2 border-sky-500 hover:bg-sky-700 hover:text-white" onClick$={() => copyTask(task)}>Copy</button>
               <button class="block text-xs py-2 px-4 border-2 border-red-500 hover:bg-red-700 hover:text-white" onClick$={() => deleteTask(task)}>Delete</button>

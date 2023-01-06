@@ -122,7 +122,7 @@ export default component$(() => {
   })
 
   return (
-    <div class="container space-y-10">
+    <div class="container space-y-10 max-w-full sm:max-w-[60vw]">
       <div class="auth text-center">
         {!auth.user && (
           <div>

@@ -19,10 +19,10 @@ const SignIn = component$(() => {
       ) : (
         <form
           preventdefault:submit
-          class="mt-5 max-w-5xl mx-auto"
+          class="mt-5 mx-auto max-w-full sm:max-w-5xl"
           onSubmit$={initSignIn}
         >
-          <div class="grid grid-cols-3 gap-5">
+          <div class="grid sm:grid-cols-3 gap-5 xs:grid-cols-1">
             <label class="leading-10" for="user_email">
               Sign In or Sign Up with your email:
             </label>

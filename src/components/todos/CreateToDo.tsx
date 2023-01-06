@@ -33,7 +33,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
   return (
     <div
       class={`relative transition-all duration-500 border-b-2 border-gray-200 ${
-        !active.value ? `h-14 overflow-hidden` : `h-[650px] pb-20 overflow-auto`
+        !active.value ? `h-14 overflow-hidden` : `sm:h-[650px] pb-20 overflow-auto`
       }`}
     >
       <form
@@ -63,7 +63,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
             </button>
           )}
         </div>
-        <div class="grid grid-cols-6 gap-5">
+        <div class="grid sm:grid-cols-6 gap-5">
           <label for="todo_title" class="leading-10 col-span-2">
             What To Do?
           </label>
@@ -81,7 +81,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
             }}
           />
         </div>
-        <div class="grid grid-cols-6 gap-5">
+        <div class="grid sm:grid-cols-6 gap-5">
           <div class="col-span-2">
             <label for="todo_link" class="leading-10">
               Helpful Links

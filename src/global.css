@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 .container {
-    @apply max-w-[60vw] mx-auto mb-10 p-10 border-2 border-gray-100;
+    @apply mx-auto mb-10 p-10 border-2 border-gray-100;
 }
