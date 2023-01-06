@@ -83,9 +83,9 @@ export const completeTask: QRL<
     client: SupabaseClient,
     task_id: string,
     isComplete: boolean
-  ) => Promise<void>
+  ) => Promise<Task|void>
 > = $(async (client, task_id, isComplete) => {
-  const { error } = await client
+  const { data: completedTask, error } = await client
     .from("tasks")
     .update({
       completed: isComplete,
@@ -99,5 +99,5 @@ export const completeTask: QRL<
     return;
   }
 
-  return;
+  return completedTask ? completedTask[0] : null;
 });

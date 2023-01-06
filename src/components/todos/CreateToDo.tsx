@@ -5,6 +5,7 @@ import {
   useClientEffect$,
   useContext,
   useSignal,
+  $
 } from "@builder.io/qwik";
 import { v4 as uuidv4 } from "uuid";
 
@@ -29,11 +30,23 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
     }
   });
 
+  const clearTask = $(() => {
+    todoState.editTask = {
+      name: "",
+      description: "",
+      completed: false,
+      created_on: new Date().toISOString(),
+      task_id: "",
+      user_id: "",
+      link: ['']
+    } as Task;
+  })
+
   const { task } = taskStore;
   return (
     <div
-      class={`relative transition-all duration-500 border-b-2 border-gray-200 ${
-        !active.value ? `h-14 overflow-hidden` : `sm:h-[650px] pb-20 overflow-auto`
+      class={`relative transition-all duration-500 border-t-2 border-gray-200 pt-5 ${
+        !active.value ? `h-20 overflow-hidden` : `sm:h-[650px] border-b-2 overflow-auto`
       }`}
     >
       <form
@@ -41,7 +54,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
         preventdefault:submit
         class={`relative space-y-5 max-w-7xl mx-auto focus:h-auto`}
       >
-        <div class="pb-5 space-x-2">
+        <div class="pb-5 space-x-2 text-center">
           <button
             class="border-2 border-sky-200 hover:border-sky-400 py-2 px-4"
             onClick$={() => {
@@ -56,6 +69,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
           {active.value && (
             <button
               onClick$={() => {
+                clearTask();
                 active.value = false;
               }}
             >
@@ -137,7 +151,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
               };
             }}
           ></textarea>
-          <a class="text-sm text-gray-400 hover:text-gray-600 block text-left" href="https://www.markdownguide.org/basic-syntax/" target={`_blank`}>Markdown Supported</a>
+          <a class="text-sm text-sky-500 hover:underline block text-left" href="https://www.markdownguide.org/basic-syntax/" target={`_blank`}>Markdown Supported</a>
         </div>
         {taskStore.task.name && (
           <div class="space-x-5">
@@ -169,7 +183,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
               value="Add"
               class="bg-red-500 py-3 px-10 rounded-xl text-white"
               onClick$={async () => {
-                todoState.editTask = {} as Task;
+                clearTask();
               }}
             >
               Clear

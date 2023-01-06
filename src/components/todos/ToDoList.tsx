@@ -12,11 +12,20 @@ interface ToDoListProps {
 
 const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteTask, completeTask }) => {
   const converter = new Converter();
-  const dateCompleted = (date: string) => {
-    const completedDate = new Date();
-    completedDate.setTime(parseInt(date));
 
+  // date completed formatting
+  const dateCompleted = (date: string) => {
+    const completedDate = new Date(Date.parse(date));
     return `${completedDate.getMonth()+1}/${completedDate.getDate()}/${completedDate.getFullYear()}`;
+  }
+
+  // days since created
+  const sinceCreated = (date: string) => {
+    const startDate = new Date( Date.parse(date) );
+    const today = new Date();
+    const diffTime = today.getTime() - startDate.getTime();    
+    const daysAgo = Math.round(diffTime / (1000 * 3600 * 24));
+    return daysAgo > 0 ? `${daysAgo} ${daysAgo === 1 ? `day` : `days`} ago` : `Today`;
   }
   return (
     <div class="tasks">
@@ -26,7 +35,7 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
       {tasks.length > 0 && (
         <h1 class="relative text-center text-5xl my-10">Your Tasks</h1>
       )}
-      {tasks.length > 0 && tasks.map((task) => {
+      {tasks.length > 0 && tasks.sort((a, b) => a.created_on < b.created_on ? 1 : -1 ).map((task) => {
         return (
           <div class="relative grid sm:grid-cols-6 p-5 hover:bg-gray-100">
             <div class="col-span-5 px-5 text-sm flex gap-5 cursor-pointer" onClick$={() => completeTask(task.task_id, !task.completed)}>
@@ -54,7 +63,7 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
                 
                 {/* Created */}
                 <p class="block text-xs text-gray-500">
-                  Created: {dateCompleted(task.created_on)}
+                  <span class="inline-block">Created: {dateCompleted(task.created_on)} {sinceCreated(task.created_on)}</span>
                 </p>
                 
                 {/* Completed */}

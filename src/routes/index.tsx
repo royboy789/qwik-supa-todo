@@ -68,12 +68,17 @@ export default component$(() => {
     const tasksCopy = [...toDoState.tasks];
     tasksCopy[editingIndex].completed = checked;
     if(checked) {
-      tasksCopy[editingIndex].completed_on = new Date().getTime().toString();
+      tasksCopy[editingIndex].completed_on = new Date().toISOString();
     }
     toDoState.tasks = [...tasksCopy];
 
     if(client && auth.user) {
-      completeTask(client, task_id, checked);
+      const completed = await completeTask(client, task_id, checked);
+      if(completed) {
+        const tasksCopy = [...toDoState.tasks];
+        tasksCopy[editingIndex] = completed;
+        toDoState.tasks = [...tasksCopy]
+      }
     }
 
     return toDoState.tasks[editingIndex];
