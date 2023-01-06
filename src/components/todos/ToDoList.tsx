@@ -37,7 +37,7 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
       )}
       {tasks.length > 0 && tasks.sort((a, b) => a.created_on < b.created_on ? 1 : -1 ).map((task) => {
         return (
-          <div class="relative grid sm:grid-cols-6 p-5 hover:bg-gray-100">
+          <div class="relative grid sm:grid-cols-6 p-5 hover:bg-gray-100 border-2 border-transparent dark:hover:bg-gray-900 ">
             <div class="col-span-5 px-5 text-sm flex gap-5 cursor-pointer" onClick$={() => completeTask(task.task_id, !task.completed)}>
               <div class="items-centet h-full flex items-center justify-center">
                 <input
@@ -56,26 +56,26 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
                 {/* Name */}
                 <label
                   for={`task-${task.task_id}`}
-                  class="text-xl font-medium text-gray-700 cursor-pointer"
+                  class="text-xl font-medium text-gray-700 dark:text-gray-200 cursor-pointer"
                 >
                   {task.name}
                 </label>
                 
                 {/* Created */}
-                <p class="block text-xs text-gray-500">
+                <p class="block text-xs text-gray-500 dark:text-gray-100">
                   <span class="inline-block">Created: {dateCompleted(task.created_on)} {sinceCreated(task.created_on)}</span>
                 </p>
                 
                 {/* Completed */}
                 {task.completed && task.completed_on && (
-                  <p class="text-xs text-gray-500">
+                  <p class="text-xs text-gray-500 dark:text-gray-100">
                     <em>Completed: {dateCompleted(task.completed_on)}</em>
                   </p>
                 )}
 
                 {/* Description */}
                 {task.description && (
-                  <div id="task-description" class="text-gray-500 sm:block hidden leading-7 mb-2 max-h-48 overflow-auto" dangerouslySetInnerHTML={converter.makeHtml(task.description)}></div>
+                  <div id="task-description" class="text-gray-500 dark:text-gray-200 sm:block hidden leading-7 mb-2 max-h-48 overflow-auto" dangerouslySetInnerHTML={converter.makeHtml(task.description)}></div>
                 )}
                 
                 {/* Links */}

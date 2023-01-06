@@ -45,8 +45,8 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
   const { task } = taskStore;
   return (
     <div
-      class={`relative transition-all duration-500 border-t-2 border-gray-200 pt-5 ${
-        !active.value ? `h-20 overflow-hidden` : `sm:h-[650px] border-b-2 overflow-auto`
+      class={`relative transition-all duration-500 border-t-2 border-gray-200 pt-8 ${
+        !active.value ? `h-20 overflow-hidden` : `sm:h-[60vh] border-b-2 pb-8 overflow-auto`
       }`}
     >
       <form
@@ -82,7 +82,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
             What To Do?
           </label>
           <input
-            class="col-span-4"
+            class="col-span-4 dark:text-black"
             type="text"
             name="todo_title"
             placeholder="What do I need to do?"
@@ -117,7 +117,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
             {task.link && task.link.map((link, i) => {
               return (
                 <input
-                  class="w-full mb-2"
+                  class="w-full mb-2 dark:text-black"
                   type="text"
                   name="todo_link"
                   placeholder="Where do I do it? Or more context?"
@@ -141,7 +141,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
           </label>
           <textarea
             name="todo_description"
-            class="w-full text-xl h-[300px] transition-all"
+            class="w-full text-xl h-[300px] transition-all dark:text-black"
             placeholder="Context & Notes"
             value={task.description}
             onChange$={(e) => {
