@@ -137,6 +137,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
               };
             }}
           ></textarea>
+          <a class="text-sm text-gray-400 hover:text-gray-600 block text-left" href="https://www.markdownguide.org/basic-syntax/" target={`_blank`}>Markdown Supported</a>
         </div>
         {taskStore.task.name && (
           <div class="space-x-5">

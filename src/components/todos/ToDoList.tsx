@@ -44,15 +44,32 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
                 />
               </div>
               <div class="flex-grow">
+                {/* Name */}
                 <label
                   for={`task-${task.task_id}`}
                   class="text-xl font-medium text-gray-700 cursor-pointer"
                 >
                   {task.name}
                 </label>
+                
+                {/* Created */}
+                <p class="block text-xs text-gray-500">
+                  Created: {dateCompleted(task.created_on)}
+                </p>
+                
+                {/* Completed */}
+                {task.completed && task.completed_on && (
+                  <p class="text-xs text-gray-500">
+                    <em>Completed: {dateCompleted(task.completed_on)}</em>
+                  </p>
+                )}
+
+                {/* Description */}
                 {task.description && (
                   <div id="task-description" class="text-gray-500 sm:block hidden leading-7 mb-2 max-h-48 overflow-auto" dangerouslySetInnerHTML={converter.makeHtml(task.description)}></div>
                 )}
+                
+                {/* Links */}
                 <p>
                   {task.link && task.link.length > 0 && task.link.map((href) => (
                     <a
@@ -65,11 +82,6 @@ const ToDoList = component$<ToDoListProps>(({ tasks, editTask, copyTask, deleteT
                     </a>
                   ))}
                 </p>
-                {task.completed && task.completed_on && (
-                  <p class="text-gray-500 mt-5">
-                    <em>Completed: {dateCompleted(task.completed_on)}</em>
-                  </p>
-                )}
               </div>
             </div>
             <div class="mt-5 sm:mt-0 w-full text-right ml-2 actions w-lg space-y-0 sm:space-y-1 space-x-5 sm:space-x-0 flex flex-row sm:flex sm:flex-col items-cneter justify-center sm:items-end">
