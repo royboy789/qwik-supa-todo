@@ -32,6 +32,7 @@ const SignIn = component$(() => {
               name="user_email"
               placeholder="Sign Up / Sign In with email"
               value=""
+              class="dark:text-black"
               onChange$={(e) =>
                 (user.email = (e.target as HTMLInputElement).value)
               }
