@@ -77,8 +77,8 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
             .map((task, i) => {
               return (
                 <div 
-                  class={`relative grid sm:grid-cols-12 py-5 hover:bg-gray-100 border-2 border-transparent dark:hover:bg-gray-900`} 
-                  data-priority={task.priority}
+                  class={`relative grid sm:grid-cols-12 py-5 pr-5 pl-2 hover:bg-gray-100 border-2 border-transparent dark:hover:bg-gray-900`} 
+                  title={`task priority: ${task.priority}`}
                   data-task={task.task_id}
                 >
                   <div class="flex items-center justify-start">
