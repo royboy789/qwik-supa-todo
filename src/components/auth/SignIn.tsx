@@ -1,8 +1,14 @@
-import { component$, useStore, $, useSignal } from "@builder.io/qwik";
+import { component$, useStore, $, useSignal, useContext } from "@builder.io/qwik";
+import { Provider } from "@supabase/supabase-js";
+
+import { supabaseContext } from "~/state/supabase";
 
 const SignIn = component$(() => {
   const user = useStore({ email: "" });
   const sent = useSignal(false);
+  const supabase = useContext(supabaseContext);
+
+  // normal sign in
   const initSignIn = $(async () => {
     sent.value = true;
     // send magiclink
@@ -12,40 +18,52 @@ const SignIn = component$(() => {
     });
   });
 
+  // sign in with provider
+  const signInProvider = $(async(provider: Provider) => {
+    const client = await supabase.client$();
+    if(!client) {
+      return;
+    }
+    const { error } = await client.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: import.meta.env.VITE_URL
+      }
+    });
+
+    if(error){
+      throw error;
+    }
+  })
+
   return (
     <div>
       {sent.value ? (
         <div>Sending a magic link to your email, use it.</div>
       ) : (
-        <form
-          preventdefault:submit
-          class="mt-5 mx-auto max-w-full sm:max-w-5xl"
-          onSubmit$={initSignIn}
-        >
-          <div class="grid sm:grid-cols-3 gap-5 xs:grid-cols-1">
-            <label class="leading-10" for="user_email">
-              Sign In or Sign Up with your email:
-            </label>
-            <input
-              type="email"
-              id="user_email"
-              name="user_email"
-              placeholder="Sign Up / Sign In with email"
-              value=""
-              class="dark:text-black"
-              onChange$={(e) =>
-                (user.email = (e.target as HTMLInputElement).value)
-              }
-            />
-            <butotn
-              type="submit"
-              onClick$={initSignIn}
-              class={`block py-2 px-4 border-2 border-sky-500 hover:bg-sky-700 hover:text-white cursor-pointer`}
-            >
-              Sign In
-            </butotn>
-          </div>
-        </form>
+        <>
+          <button onClick$={() => signInProvider('github')} class="block my-3 mx-auto border border-white rounded py-2 px-5">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="h-6 w-6 fill-white inline-block mr-2">
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M12 2C6.477 2 2 6.463 2 11.97c0 4.404 2.865 8.14 6.839 9.458.5.092.682-.216.682-.48 0-.236-.008-.864-.013-1.695-2.782.602-3.369-1.337-3.369-1.337-.454-1.151-1.11-1.458-1.11-1.458-.908-.618.069-.606.069-.606 1.003.07 1.531 1.027 1.531 1.027.892 1.524 2.341 1.084 2.91.828.092-.643.35-1.083.636-1.332-2.22-.251-4.555-1.107-4.555-4.927 0-1.088.39-1.979 1.029-2.675-.103-.252-.446-1.266.098-2.638 0 0 .84-.268 2.75 1.022A9.607 9.607 0 0 1 12 6.82c.85.004 1.705.114 2.504.336 1.909-1.29 2.747-1.022 2.747-1.022.546 1.372.202 2.386.1 2.638.64.696 1.028 1.587 1.028 2.675 0 3.83-2.339 4.673-4.566 4.92.359.307.678.915.678 1.846 0 1.332-.012 2.407-.012 2.734 0 .267.18.577.688.48 3.97-1.32 6.833-5.054 6.833-9.458C22 6.463 17.522 2 12 2Z"
+              ></path>
+            </svg>
+            Login with GitHub
+          </button>
+          <form preventdefault:submit class="mt-5 mx-auto max-w-full sm:max-w-5xl" onSubmit$={initSignIn}>
+            <div class="grid sm:grid-cols-3 gap-5 xs:grid-cols-1">
+              <label class="leading-10" for="user_email">
+                Sign In or Sign Up with your email:
+              </label>
+              <input type="email" id="user_email" name="user_email" placeholder="Sign Up / Sign In with email" value="" class="dark:text-black" onChange$={(e) => (user.email = (e.target as HTMLInputElement).value)} />
+              <butotn type="submit" onClick$={initSignIn} class={`block py-2 px-4 border-2 border-sky-500 hover:bg-sky-700 hover:text-white cursor-pointer`}>
+                Sign In
+              </butotn>
+            </div>
+          </form>
+        </>
       )}
     </div>
   );
