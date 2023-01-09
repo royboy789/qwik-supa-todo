@@ -109,7 +109,7 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
                   <div class="col-span-10 px-5 text-sm flex gap-5 cursor-pointer" onClick$={() => completeTask(task.task_id, !task.completed)}>
                     <div class="flex-grow flex justify-center flex-col">
                       {/* Name */}
-                      <label for={`task-${task.task_id}`} class={`text-xl font-medium cursor-pointer ${task.priority < 0 ? `text-orange-500 dark:text-orange-500` : `text-gray-700 dark:text-gray-200`}`}>
+                      <label for={`task-${task.task_id}`} class={`text-xl font-medium cursor-pointer ${task.priority < 3 ? `text-orange-500 dark:text-orange-500` : `text-gray-700 dark:text-gray-200`}`}>
                         {task.name}
                       </label>
 
