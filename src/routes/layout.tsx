@@ -102,7 +102,9 @@ export default component$(() => {
           <Resource
             value={session}
             onResolved={(sess) => {
-              supabase.user = sess.session?.user || false;
+              if(sess) {
+                supabase.user = sess.session?.user || false;
+              }
               return <Slot />;
             }}
           />
