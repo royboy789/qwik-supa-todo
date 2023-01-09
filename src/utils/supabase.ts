@@ -47,6 +47,7 @@ export const editTask: QRL<
       link: task.link,
       description: task.description,
       name: task.name,
+      priority: task.priority
     })
     .eq("task_id", task.task_id)
     .select("*");
