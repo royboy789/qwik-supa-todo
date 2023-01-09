@@ -38,7 +38,8 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
       created_on: new Date().toISOString(),
       task_id: "",
       user_id: "",
-      link: ['']
+      link: [''],
+      priority: 0,
     } as Task;
   })
 
@@ -91,6 +92,25 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
               taskStore.task = {
                 ...task,
                 name: (e.target as HTMLInputElement).value,
+              };
+            }}
+          />
+        </div>
+        <div class="grid sm:grid-cols-6 gap-5">
+          <label for="todo_priority" class="leading-10 col-span-2">
+            How important is it?
+          </label>
+          <input
+            class="col-span-4 dark:text-black"
+            type="number"
+            min={-1}
+            name="todo_priority"
+            placeholder="Priority Level"
+            value={task.priority}
+            onChange$={(e) => {
+              taskStore.task = {
+                ...task,
+                priority: parseInt((e.target as HTMLInputElement).value),
               };
             }}
           />
@@ -171,7 +191,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
                 await createToDo(taskStore.task);
                 active.value = false;
                 taskStore.task = {} as Task;
-                todoState.editTask = {} as Task;
+                clearTask();
               }}
             >
               {!todoState.editTask.name || todoState.editTask.name === ""

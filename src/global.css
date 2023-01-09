@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .container {
-    @apply mx-auto mb-10 p-10 border-2 border-gray-100;
+    @apply mx-auto mb-10 p-5 border-2 border-gray-100;
 }
 
 #task-description {

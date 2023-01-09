@@ -9,6 +9,7 @@ export type Task = {
     created_on: string;
     task_id: string;
     user_id: string;
+    priority: number;
 }
 
 export interface ToDoContext {

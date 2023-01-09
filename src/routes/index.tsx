@@ -148,7 +148,6 @@ export default component$(() => {
       </div>
       <CreateToDo createToDo={createTask} />
       <ToDoList
-        tasks={toDoState.tasks}
         editTask={initEdit}
         copyTask={initCopy}
         deleteTask={initDelete}
