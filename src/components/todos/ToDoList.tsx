@@ -1,8 +1,10 @@
 import { component$, QRL, $, useContext, useStore, useClientEffect$ } from "@builder.io/qwik";
 import { Converter } from "showdown";
-import { Task } from "~/state/todoContext";
 
-import { todoContext } from "~/state/todoContext";
+import { supabaseContext } from "~/state/supabase";
+import { Task, todoContext } from "~/state/todoContext";
+
+import { editTask as editTaskSupa } from "~/utils/supabase";
 
 interface ToDoListProps {
   editTask: QRL<(task: Task) => Promise<Task>>;
@@ -14,6 +16,7 @@ interface ToDoListProps {
 const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, completeTask }) => {
   const converter = new Converter();
   const toDoState = useContext(todoContext);
+  const supabase = useContext(supabaseContext);
   const myTasks = useStore({tasks: toDoState.tasks});
 
   useClientEffect$(({track}) => {
@@ -27,7 +30,6 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
       return "";
     }
     const completedDate = new Date(Date.parse(date));
-    console.log(completedDate.getMonth(), date);
     return `${completedDate.getMonth() + 1}/${completedDate.getDate()}/${completedDate.getFullYear()}`;
   };
 
@@ -40,15 +42,23 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
     return daysAgo > 0 ? `${daysAgo} ${daysAgo === 1 ? `day` : `days`} ago` : `Today`;
   };
 
-  const changePriority = $((move: string, index: number) => {
+  const changePriority = $(async(move: string, index: number) => {
     const tasksCopy = [...myTasks.tasks];
+    const client = await supabase.client$();
     switch(move) {
       case 'up':
         tasksCopy[index].priority++;
+        if(supabase.user && client) {
+          await editTaskSupa(client, tasksCopy[index])
+        }        
         toDoState.tasks = [...tasksCopy];
+
       return;
       case 'down':
         tasksCopy[index].priority-=1;
+        if(supabase.user && client) {
+          await editTaskSupa(client, tasksCopy[index])
+        }
         toDoState.tasks = [...tasksCopy];
       return;
       default: 
