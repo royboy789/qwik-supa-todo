@@ -1,4 +1,4 @@
-import { component$, useStyles$, useContextProvider, $, useStore, useClientEffect$ } from '@builder.io/qwik';
+import { component$, useStyles$, useContextProvider, $, useStore } from '@builder.io/qwik';
 import { QwikCityProvider, RouterOutlet, ServiceWorkerRegister } from '@builder.io/qwik-city';
 import { createClient } from '@supabase/supabase-js';
 import { supabaseContext, SupaContextProps } from '~/state/supabase';
@@ -12,8 +12,7 @@ import { RouterHead } from '~/components/router-head/router-head';
 export const supabaseClient = import.meta.env.VITE_SUPABASE_URL ? createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
-) : false;
-
+) : false
 
 
 export default component$(() => {
@@ -21,27 +20,6 @@ export default component$(() => {
   const supaContext = useStore<SupaContextProps>({
     client$: $(() => supabaseClient),
     user: false
-  })
-
-  useClientEffect$(async({track}) => {
-    track(() => supaContext);
-    const client = await supaContext.client$();
-    if(!client) {
-      return;
-    }
-    
-    // get session from supa
-    const { data: userSession, error } = await client.auth.getSession();
-    if( error ) {
-      console.error(error);
-    }
-    
-    // set user
-    if(userSession.session) {
-      supaContext.user = userSession.session.user;
-    } else {
-      console.log('not logged in');
-    }
   })
 
   useContextProvider(supabaseContext, supaContext);
