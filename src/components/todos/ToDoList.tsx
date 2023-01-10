@@ -76,11 +76,13 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
       {myTasks.tasks.length === 0 && <div class="relative text-center text-3xl mt-10">No Tasks Yet</div>}
       
       {/* FILTER */}
-      <div class="flex justify-center align-middle items-center my-5 relative space-x-5">
-        <span class="hidden sm:block absolute top-1/2 h-1 opacity-70 bg-gray-100 w-full -z-10"></span>
-        <button onClick$={() => { filters.taskFilter = 'incomplete' }} class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium  hover:text-sky-700 ${filters.taskFilter === "incomplete" ? "text-sky-400" : "text-gray-400"}`}>Tasks</button>
-        <button onClick$={() => { filters.taskFilter = 'completed' }} class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium hover:text-sky-700 ${filters.taskFilter === "completed" ? "text-sky-400" : "text-gray-400"}`}>Completed Tasks</button>
-      </div>
+      {myTasks.tasks.length > 0 && (
+        <div class="flex justify-center align-middle items-center my-5 relative space-x-5">
+          <span class="hidden sm:block absolute top-1/2 h-1 opacity-70 bg-gray-100 w-full -z-10"></span>
+          <button onClick$={() => { filters.taskFilter = 'incomplete' }} class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium  hover:text-sky-700 ${filters.taskFilter === "incomplete" ? "text-sky-400" : "text-gray-400"}`}>Tasks</button>
+          <button onClick$={() => { filters.taskFilter = 'completed' }} class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium hover:text-sky-700 ${filters.taskFilter === "completed" ? "text-sky-400" : "text-gray-400"}`}>Completed Tasks</button>
+        </div>
+      )}
       
       {/* TASKS */}
       <div>
