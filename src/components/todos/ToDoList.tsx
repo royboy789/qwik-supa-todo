@@ -13,16 +13,21 @@ interface ToDoListProps {
   completeTask: QRL<(task_id: string, checked: boolean) => Promise<Task>>;
 }
 
+type taskFilters = "completed" | "incomplete";
+
 const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, completeTask }) => {
   const converter = new Converter();
   const toDoState = useContext(todoContext);
   const supabase = useContext(supabaseContext);
-  const myTasks = useStore({tasks: toDoState.tasks});
+  const myTasks = useStore({ tasks: toDoState.tasks });
+  const filters: { taskFilter: taskFilters } = useStore({
+    taskFilter: "incomplete",
+  });
 
-  useClientEffect$(({track}) => {
+  useClientEffect$(({ track }) => {
     track(() => toDoState.tasks);
     myTasks.tasks = toDoState.tasks;
-  })
+  });
 
   // date completed formatting
   const dateCompleted = (date: string) => {
@@ -42,52 +47,66 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
     return daysAgo > 0 ? `${daysAgo} ${daysAgo === 1 ? `day` : `days`} ago` : `Today`;
   };
 
-  const changePriority = $(async(move: string, index: number) => {
+  const changePriority = $(async (move: string, index: number) => {
     const tasksCopy = [...myTasks.tasks];
     const client = await supabase.client$();
-    switch(move) {
-      case 'up':
+    switch (move) {
+      case "up":
         tasksCopy[index].priority++;
-        if(supabase.user && client) {
-          await editTaskSupa(client, tasksCopy[index])
-        }        
-        toDoState.tasks = [...tasksCopy];
-
-      return;
-      case 'down':
-        tasksCopy[index].priority-=1;
-        if(supabase.user && client) {
-          await editTaskSupa(client, tasksCopy[index])
+        if (supabase.user && client) {
+          await editTaskSupa(client, tasksCopy[index]);
         }
         toDoState.tasks = [...tasksCopy];
-      return;
-      default: 
-      return;
+
+        return;
+      case "down":
+        tasksCopy[index].priority -= 1;
+        if (supabase.user && client) {
+          await editTaskSupa(client, tasksCopy[index]);
+        }
+        toDoState.tasks = [...tasksCopy];
+        return;
+      default:
+        return;
     }
-  })
+  });
 
   return (
     <div class="tasks">
       {myTasks.tasks.length === 0 && <div class="relative text-center text-3xl mt-10">No Tasks Yet</div>}
-      {myTasks.tasks.length > 0 && <h1 class="relative text-center text-5xl my-10">Your Tasks</h1>}
+      
+      {/* FILTER */}
+      <div class="flex justify-center align-middle items-center my-5 relative space-x-5">
+        <span class="hidden sm:block absolute top-1/2 h-1 opacity-70 bg-gray-100 w-full -z-10"></span>
+        <button onClick$={() => { filters.taskFilter = 'incomplete' }} class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium  hover:text-sky-700 ${filters.taskFilter === "incomplete" ? "text-sky-400" : "text-gray-400"}`}>Tasks</button>
+        <button onClick$={() => { filters.taskFilter = 'completed' }} class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium hover:text-sky-700 ${filters.taskFilter === "completed" ? "text-sky-400" : "text-gray-400"}`}>Completed Tasks</button>
+      </div>
+      
+      {/* TASKS */}
       <div>
         {myTasks.tasks.length > 0 &&
           myTasks.tasks
+            .filter((task) => {
+              switch (filters.taskFilter) {
+                case "completed":
+                  return task.completed;
+                case "incomplete":
+                  return !task.completed;
+                default:
+                  return true;
+              }
+            })
             .sort((a, b) => (a.priority < b.priority ? -1 : 1))
             .map((task, i) => {
               return (
-                <div 
-                  class={`relative grid sm:grid-cols-12 py-5 pr-5 pl-2 hover:bg-gray-100 border-2 border-transparent dark:hover:bg-gray-900`} 
-                  title={`task priority: ${task.priority}`}
-                  data-task={task.task_id}
-                >
+                <div class={`relative grid sm:grid-cols-12 py-5 pr-5 pl-2 hover:bg-gray-100 border-2 border-transparent dark:hover:bg-gray-900`} title={`task priority: ${task.priority}`} data-task={task.task_id}>
                   <div class="flex items-center justify-start">
-                    <button title="change priority level up 1" onClick$={() => changePriority('up', i)}>
+                    <button title="change priority level up 1" onClick$={() => changePriority("up", i)}>
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l7.5-7.5 7.5 7.5m-15 6l7.5-7.5 7.5 7.5" />
                       </svg>
                     </button>
-                    <button title="change priority level down 1" onClick$={() => changePriority('down', i)}>
+                    <button title="change priority level down 1" onClick$={() => changePriority("down", i)}>
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.25l-7.5 7.5-7.5-7.5m15 6l-7.5 7.5-7.5-7.5" />
                       </svg>
@@ -142,7 +161,7 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
                       </p>
                     </div>
                   </div>
-                  <div class="mt-5 sm:mt-0 w-full text-right ml-2 actions w-lg space-y-0 sm:space-y-1 space-x-5 sm:space-x-0 flex flex-row sm:flex sm:flex-col items-cneter justify-center sm:items-end">
+                  <div class="mt-5 sm:mt-0 w-full text-right ml-2 actions w-lg space-y-0 sm:space-y-3 space-x-5 sm:space-x-0 flex flex-row sm:flex sm:flex-col items-cneter justify-center sm:items-end">
                     <button class="block text-xs py-2 px-4 border-2 border-sky-500 hover:bg-sky-700 hover:text-white" onClick$={() => editTask(task)}>
                       Edit
                     </button>
