@@ -28,6 +28,7 @@ export const onGet: RequestHandler<AuthResponse["data"] | void> = async ({ reque
   const params = new URLSearchParams(cookies?.replace(/; /g, "&"));
   const access_token = params.get("access_token");
   const refresh_token = params.get("refresh_token");
+
   if (!access_token || !refresh_token) {
     return;
   }
@@ -102,7 +103,7 @@ export default component$(() => {
           <Resource
             value={session}
             onResolved={(sess) => {
-              if(sess) {
+              if(sess && sess.session) {
                 supabase.user = sess.session?.user || false;
               }
               return <Slot />;

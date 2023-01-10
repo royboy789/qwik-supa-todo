@@ -1,4 +1,4 @@
-import { component$, useStore, $, useSignal, useContext, useClientEffect$ } from "@builder.io/qwik";
+import { component$, useStore, $, useSignal, useContext } from "@builder.io/qwik";
 import { Provider } from "@supabase/supabase-js";
 
 import { supabaseContext } from "~/state/supabase";
@@ -7,19 +7,6 @@ const SignIn = component$(() => {
   const user = useStore({ email: "" });
   const sent = useSignal(false);
   const supabase = useContext(supabaseContext);
-
-  useClientEffect$(async({track}) => {
-    track(() => supabase.user);
-    if(!supabase.user) {
-      return;
-    }
-
-    const cookies = JSON.parse(window.localStorage.getItem('sb-cxwhwqmnanjazcbtuiis-auth-token') || '{}');
-    if( cookies.access_token && cookies.refresh_token ) {
-      document.cookie = `access_token=${cookies.access_token}`;
-      document.cookie = `refresh_token=${cookies.refresh_token}`;
-    }
-  })
 
   // normal sign in
   const initSignIn = $(async () => {
@@ -38,7 +25,10 @@ const SignIn = component$(() => {
       return;
     }
     const { error } = await client.auth.signInWithOAuth({
-      provider
+      provider,
+      options: {
+        redirectTo: import.meta.env.VITE_URL
+      }
     });
 
     if(error){

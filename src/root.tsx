@@ -1,4 +1,4 @@
-import { component$, useStyles$, useContextProvider, $, useStore } from '@builder.io/qwik';
+import { component$, useStyles$, useContextProvider, $, useStore, useClientEffect$ } from '@builder.io/qwik';
 import { QwikCityProvider, RouterOutlet, ServiceWorkerRegister } from '@builder.io/qwik-city';
 import { createClient } from '@supabase/supabase-js';
 import { supabaseContext, SupaContextProps } from '~/state/supabase';
@@ -20,6 +20,37 @@ export default component$(() => {
   const supaContext = useStore<SupaContextProps>({
     client$: $(() => supabaseClient),
     user: false
+  })  
+
+  useClientEffect$(async({track}) => {
+    track(() => supaContext);
+    const client = await supaContext.client$();
+    if(!client || supaContext.user) {
+      return;
+    }
+
+    const localStoreSession = JSON.parse(window.localStorage.getItem('sb-cxwhwqmnanjazcbtuiis-auth-token') || '{}');
+    if( localStoreSession.access_token && localStoreSession.refresh_token ) {
+      document.cookie = `access_token=${localStoreSession.access_token}`;
+      document.cookie = `refresh_token=${localStoreSession.refresh_token}`;
+    }
+    
+    // get session from supa
+    const { data: userSession, error } = await client.auth.getSession();
+    if( error ) {
+      console.error(error);
+    }
+    
+    // set user
+    if(userSession.session) {
+      supaContext.user = userSession.session.user;
+      if('' === localStoreSession.access_token || !localStoreSession.access_token ) {
+        document.cookie = `access_token=${userSession.session.access_token}`;
+        document.cookie = `refresh_token=${userSession.session.refresh_token}`;
+      }
+    } else {
+      console.log('not logged in');
+    }
   })
 
   useContextProvider(supabaseContext, supaContext);
