@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+    @apply box-border;
+}
+
 .container {
     @apply mx-auto mb-10 p-5;
 }

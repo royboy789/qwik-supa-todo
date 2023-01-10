@@ -46,8 +46,8 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
   const { task } = taskStore;
   return (
     <div
-      class={`relative transition-all duration-500 border-t-2 border-gray-200 pt-8 ${
-        !active.value ? `h-20 overflow-hidden` : `sm:h-[60vh] pb-8 overflow-auto`
+      class={`relative transition-all duration-500 border-t-2 border-gray-200 pt-10 ${
+        !active.value ? `h-[94px] overflow-hidden` : `sm:h-[60vh] pb-8 overflow-auto`
       }`}
     >
       <form
