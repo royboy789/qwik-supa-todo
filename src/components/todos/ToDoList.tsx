@@ -24,8 +24,8 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
   const filters: { taskFilter: taskFilters; dateRange: { start: string; end: string } } = useStore({
     taskFilter: "incomplete",
     dateRange: {
-      start: "2023-01-11",
-      end: "2023-01-12",
+      start: '',
+      end: '',
     },
   });
 
