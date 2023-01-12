@@ -82,7 +82,7 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
     newTasks.tasks.sort((a, b) => {
       switch (filters.taskFilter) {
         case "completed":
-          return (a.completed_on || 0) < (b.completed_on || 0) ? -1 : 1;
+          return (a.completed_on || 0) < (b.completed_on || 0) ? 1 : -1;
         default:
           return a.priority < b.priority ? -1 : 1;
       }
