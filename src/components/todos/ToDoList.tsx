@@ -22,51 +22,73 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
   const myTasks = useStore({ tasks: toDoState.tasks });
   const filteredTasks = useStore({ tasks: toDoState.tasks });
   const filters: { taskFilter: taskFilters; dateRange: { start: string; end: string } } = useStore({
-    taskFilter: "completed",
+    taskFilter: "incomplete",
     dateRange: {
-      start: "",
-      end: "",
+      start: "2023-01-11",
+      end: "2023-01-12",
     },
   });
 
   // Completed Filter Callback
   const completedFilter: QRL<(task: Task) => Promise<boolean>> = $(async (task) => {
-    console.log(filters.dateRange);
+    let returnTask = true;
 
+    // check date range
+    const startDate = "" !== filters.dateRange.start ? new Date(Date.parse(filters.dateRange.start)) : false;
+    const endDate = "" !== filters.dateRange.end ? new Date(Date.parse(filters.dateRange.end)) : false;
+    if (startDate && endDate) {
+      const completedDate = task.completed_on ? new Date(Date.parse(task.completed_on)) : false;
+      if (completedDate) {
+        // start only
+        if (startDate && !endDate && completedDate.getTime() < startDate.getTime()) {
+          returnTask = false;
+        }
 
-    return task.completed;
+        // end only
+        if (!startDate && endDate && completedDate.getTime() < endDate.getTime()) {
+          returnTask = false;
+        }
+
+        // start and end
+        if (startDate && endDate && (completedDate.getTime() < startDate.getTime() || completedDate.getTime() > endDate.getTime())) {
+          returnTask = false;
+        }
+      }
+    }
+
+    return returnTask;
   });
 
   // Filter and Sort
   const filterSortTasks: QRL<(tasks: Task[]) => Promise<Task[]>> = $(async (tasks) => {
-    const newTasks : {tasks: Task[]} = { tasks: [] as Task[] };
+    const newTasks: { tasks: Task[] } = { tasks: [] as Task[] };
 
-    for(let i = 0;i < tasks.length;i++) {
-      switch(filters.taskFilter) {
+    for (let i = 0; i < tasks.length; i++) {
+      switch (filters.taskFilter) {
         case "completed":
-          const completed = await completedFilter(tasks[i]);
-          if(completed) {
-            newTasks.tasks = [...newTasks.tasks, tasks[i]]
+          const completed = tasks[i].completed && (await completedFilter(tasks[i]));
+          if (completed) {
+            newTasks.tasks = [...newTasks.tasks, tasks[i]];
           }
-        break;
+          break;
         case "incomplete":
-          if(!tasks[i].completed) {
-            newTasks.tasks = [...newTasks.tasks, tasks[i]]
+          if (!tasks[i].completed) {
+            newTasks.tasks = [...newTasks.tasks, tasks[i]];
           }
-        break;
+          break;
       }
     }
 
-      newTasks.tasks.sort((a, b) => {
-        switch (filters.taskFilter) {
-          case "completed":
-            return (a.completed_on || 0) < (b.completed_on || 0) ? 1 : -1;
-          default:
-            return a.priority < b.priority ? -1 : 1;
-        }
-      });
+    newTasks.tasks.sort((a, b) => {
+      switch (filters.taskFilter) {
+        case "completed":
+          return (a.completed_on || 0) < (b.completed_on || 0) ? -1 : 1;
+        default:
+          return a.priority < b.priority ? -1 : 1;
+      }
+    });
 
-      return newTasks.tasks;
+    return newTasks.tasks;
   });
 
   // set myTasks
@@ -105,6 +127,7 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
 
   // set date range
   const setDateRange = $((date: string, isStart: boolean) => {
+    console.log(date);
     if (isStart) {
       filters.dateRange = {
         ...filters.dateRange,
@@ -169,26 +192,42 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
         </div>
       )}
 
-      {filters.taskFilter === "completed" && (
-        <div>
-          <input
-            type="date"
-            class={`dark:text-gray-400`}
-            onChange$={(e) => {
-              setDateRange((e.target as HTMLInputElement).value, true);
-            }}
-            value={filters.dateRange.start}
-          />
-          <input
-            type="date"
-            class={`dark:text-gray-400`}
-            onChange$={(e) => {
-              setDateRange((e.target as HTMLInputElement).value, false);
-            }}
-            value={filters.dateRange.end}
-          />
+      {/* DATE RANGE */}
+      {myTasks.tasks.length > 0 && filters.taskFilter === "completed" && (
+        <div class="text-center pt-5">
+          <em>Completed Date Range</em>
+          <div class="flex flex-row align-center justify-center items-center gap-5 py-2">
+            <input
+              type="date"
+              class={`dark:text-gray-400`}
+              onChange$={(e) => {
+                setDateRange((e.target as HTMLInputElement).value, true);
+              }}
+              value={filters.dateRange.start}
+            />
+            <input
+              type="date"
+              class={`dark:text-gray-400`}
+              onChange$={(e) => {
+                setDateRange((e.target as HTMLInputElement).value, false);
+              }}
+              value={filters.dateRange.end}
+            />
+          </div>
+          <div class="text-center pb-5">
+            {(filters.dateRange.start !== "" || filters.dateRange.start !== "") && (
+              <>
+                <button class="dark:text-gray-400 hover:dark:text-gray-200" onClick$={() => (filters.dateRange = { start: "", end: "" })}>
+                  reset
+                </button>
+              </>
+            )}
+          </div>
         </div>
       )}
+
+      {/* NO TASKS - Filters */}
+      {myTasks.tasks.length > 0 && filteredTasks.tasks.length === 0 && <div class="relative text-center text-3xl mt-10">No tasks with your filters</div>}
 
       {/* TASKS */}
       <div>
