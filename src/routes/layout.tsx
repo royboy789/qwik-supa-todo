@@ -78,7 +78,6 @@ export default component$(() => {
     if (!loaded.value && tasks.length === 0) {
       if (!user || !client) {
         const localTasks = JSON.parse(window.localStorage.getItem("myTasks") || "[]");
-        console.log(localTasks);
         taskStore.tasks = [...localTasks] || [];
         loaded.value = true;
         return;
