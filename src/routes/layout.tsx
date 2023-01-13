@@ -1,4 +1,4 @@
-import { component$, Slot, useClientEffect$, useStore, useContextProvider, useContext, useSignal, Resource } from "@builder.io/qwik";
+import { component$, Slot, useClientEffect$, useStore, useContextProvider, useContext, useSignal, Resource, QRL, $ } from "@builder.io/qwik";
 import { isServer } from "@builder.io/qwik/build";
 import { RequestHandler, useEndpoint } from "@builder.io/qwik-city";
 import { createClient, AuthResponse } from "@supabase/supabase-js";
@@ -50,6 +50,7 @@ export default component$(() => {
   const supabase = useContext(supabaseContext);
   const taskStore: ToDoContext = useStore({
     tasks: [],
+    tags: [''],
     editTask: {
       name: "",
       description: "",
@@ -58,8 +59,22 @@ export default component$(() => {
       task_id: "",
       user_id: "",
       link: [""],
+      tags: [""],
     } as Task,
   });
+
+  // Get All Tags
+  const getTags: QRL<(tasks: Task[]) => string[]> = $((tasks) => {
+    const returnTags: { tags: string[] } = { tags: [] };
+    tasks.forEach((task) => {
+      if(!task.tags) {
+        return;
+      }
+      returnTags.tags = [...returnTags.tags, ...task.tags];
+    })
+    returnTags.tags = returnTags.tags.filter((tag, i, tags) => tags.indexOf(tag) === i)
+    return returnTags.tags;
+  })
 
   useClientEffect$(async ({ track }) => {
     if (isServer) {
@@ -79,11 +94,13 @@ export default component$(() => {
       if (!user || !client) {
         const localTasks = JSON.parse(window.localStorage.getItem("myTasks") || "[]");
         taskStore.tasks = [...localTasks] || [];
+        taskStore.tags = await getTags([...taskStore.tasks]);
         loaded.value = true;
         return;
       }
       const cloudTasks = await getTasks(client);
       taskStore.tasks = [...cloudTasks];
+      taskStore.tags = await getTags([...taskStore.tasks]);
       loaded.value = true;
       return;
     }

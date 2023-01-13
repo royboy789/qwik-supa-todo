@@ -5,6 +5,7 @@ import { supabaseContext } from "~/state/supabase";
 import { Task, todoContext } from "~/state/todoContext";
 
 import { editTask as editTaskSupa } from "~/utils/supabase";
+import { dateFilter } from "~/utils/filters";
 
 interface ToDoListProps {
   editTask: QRL<(task: Task) => Promise<Task>>;
@@ -23,40 +24,11 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
   const filteredTasks = useStore({ tasks: toDoState.tasks });
   const filters: { taskFilter: taskFilters; dateRange: { start: string; end: string } } = useStore({
     taskFilter: "incomplete",
+    taskTags: [''],
     dateRange: {
       start: '',
       end: '',
     },
-  });
-
-  // Completed Filter Callback
-  const completedFilter: QRL<(task: Task) => Promise<boolean>> = $(async (task) => {
-    let returnTask = true;
-
-    // check date range
-    const startDate = "" !== filters.dateRange.start ? new Date(Date.parse(filters.dateRange.start)) : false;
-    const endDate = "" !== filters.dateRange.end ? new Date(Date.parse(filters.dateRange.end)) : false;
-    if (startDate && endDate) {
-      const completedDate = task.completed_on ? new Date(Date.parse(task.completed_on)) : false;
-      if (completedDate) {
-        // start only
-        if (startDate && !endDate && completedDate.getTime() < startDate.getTime()) {
-          returnTask = false;
-        }
-
-        // end only
-        if (!startDate && endDate && completedDate.getTime() < endDate.getTime()) {
-          returnTask = false;
-        }
-
-        // start and end
-        if (startDate && endDate && (completedDate.getTime() < startDate.getTime() || completedDate.getTime() > endDate.getTime())) {
-          returnTask = false;
-        }
-      }
-    }
-
-    return returnTask;
   });
 
   // Filter and Sort
@@ -66,8 +38,8 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
     for (let i = 0; i < tasks.length; i++) {
       switch (filters.taskFilter) {
         case "completed":
-          const completed = tasks[i].completed && (await completedFilter(tasks[i]));
-          if (completed) {
+          const completed = tasks[i].completed && (await dateFilter(tasks[i], filters.dateRange));
+          if (tasks[i].completed && completed) {
             newTasks.tasks = [...newTasks.tasks, tasks[i]];
           }
           break;
@@ -294,6 +266,13 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
                           </a>
                         ))}
                     </p>
+
+                    {/* Tags */}
+                    {task.tags && (
+                      <div class="flex gap-2 mt-3">
+                        {task.tags.map((tag) => <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">{tag}</span>)}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div class="col-span-2 mt-5 sm:mt-0 w-full text-right ml-2 actions flex flex-row align-center items-center justify-center">

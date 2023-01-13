@@ -25,6 +25,7 @@ export const insertTask: QRL<
       description: task.description,
       name: task.name,
       user_id: user_id,
+      tags: task.tags,
     })
     .select("*");
   if (error) {

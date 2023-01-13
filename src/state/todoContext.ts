@@ -16,6 +16,7 @@ export type Task = {
 export interface ToDoContext {
     tasks: Task[];
     editTask: Task;
+    tags: string[];
 }
 
 
