@@ -33,8 +33,8 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
       created_on: new Date().toISOString(),
       task_id: "",
       user_id: "",
-      link: [""],
-      tags: [""],
+      link: [],
+      tags: [],
       priority: 0,
     } as Task;
   });

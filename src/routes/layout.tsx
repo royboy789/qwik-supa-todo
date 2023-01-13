@@ -48,9 +48,9 @@ export default component$(() => {
   const session = useEndpoint<AuthResponse["data"]>();
   const loaded = useSignal(false);
   const supabase = useContext(supabaseContext);
-  const taskStore: ToDoContext = useStore({
+  const taskStore : ToDoContext = useStore({
     tasks: [],
-    tags: [''],
+    tags: [],
     editTask: {
       name: "",
       description: "",
@@ -58,8 +58,8 @@ export default component$(() => {
       created_on: new Date().toISOString(),
       task_id: "",
       user_id: "",
-      link: [""],
-      tags: [""],
+      link: [],
+      tags: [],
     } as Task,
   });
 

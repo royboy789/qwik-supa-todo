@@ -102,7 +102,7 @@ export default component$(() => {
   const initDelete = $(async (task: Task) => {
     const areYouSure = confirm(`Delete ${task.name} ?`);
     if(!areYouSure) {
-      return;
+      return task;
     }
     const client = await supabase.client$();
     if (!task.task_id || !client) {
