@@ -84,11 +84,13 @@ export default component$(() => {
       }
       const cloudTasks = await getTasks(client);
       taskStore.tasks = [...cloudTasks];
+      loaded.value = true;
       return;
     }
 
     if (tasks.length > 0 && !user) {
       window.localStorage.setItem("myTasks", JSON.stringify(tasks));
+      loaded.value = true;
       return;
     }
   });

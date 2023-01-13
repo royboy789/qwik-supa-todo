@@ -1,16 +1,11 @@
-import {
-  component$,
-  useStore,
-  QRL,
-  useClientEffect$,
-  useContext,
-  useSignal,
-  $
-} from "@builder.io/qwik";
+import { component$, useStore, QRL, useClientEffect$, useContext, useSignal, $ } from "@builder.io/qwik";
 import { v4 as uuidv4 } from "uuid";
 
 import type { Task } from "~/state/todoContext";
 import { todoContext } from "~/state/todoContext";
+
+// Components
+
 
 interface CreateToDoProps {
   createToDo: QRL<(task: Task) => Promise<Task>>;
@@ -38,23 +33,18 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
       created_on: new Date().toISOString(),
       task_id: "",
       user_id: "",
-      link: [''],
+      link: [""],
+      tags: [""],
       priority: 0,
     } as Task;
-  })
+  });
 
   const { task } = taskStore;
+
   return (
-    <div
-      class={`relative transition-all duration-500 border-t-2 border-gray-200 pt-10 ${
-        !active.value ? `h-[94px] overflow-hidden` : `sm:h-[60vh] pb-8 overflow-auto`
-      }`}
-    >
-      <form
-        id="task-form"
-        preventdefault:submit
-        class={`relative space-y-5 max-w-7xl mx-auto focus:h-auto`}
-      >
+    <div class={`relative transition-all duration-500 border-t-2 border-gray-200 pt-10 ${!active.value ? `h-[94px] overflow-hidden` : `sm:h-[60vh] pb-8 overflow-auto`}`}>
+      <form id="task-form" preventdefault:submit class={`relative space-y-5 max-w-7xl mx-auto focus:h-auto`}>
+        {/* TOP Create / Edit / Close Buttons */}
         <div class="pb-5 space-x-2 text-center">
           <button
             class="border-2 border-sky-200 hover:border-sky-400 py-2 px-4"
@@ -62,10 +52,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
               active.value = true;
             }}
           >
-            {!todoState.editTask.name || todoState.editTask.name === ""
-              ? `Create`
-              : `Edit`}{" "}
-            Task
+            {!todoState.editTask.name || todoState.editTask.name === "" ? `Create` : `Edit`} Task
           </button>
           {active.value && (
             <button
@@ -78,6 +65,8 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
             </button>
           )}
         </div>
+
+        {/* Name of Task */}
         <div class="grid sm:grid-cols-6 gap-5">
           <label for="todo_title" class="leading-10 col-span-2">
             What To Do?
@@ -115,6 +104,8 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
             }}
           />
         </div>
+
+        {/* Helpful Links */}
         <div class="grid sm:grid-cols-6 gap-5">
           <div class="col-span-2">
             <label for="todo_link" class="leading-10">
@@ -134,27 +125,73 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
             </button>
           </div>
           <divm class="col-span-4">
-            {task.link && task.link.map((link, i) => {
-              return (
-                <input
-                  class="w-full mb-2 dark:text-black"
-                  type="text"
-                  name="todo_link"
-                  placeholder="Where do I do it? Or more context?"
-                  value={link}
-                  onChange$={(e) => {
-                    const linkCopy = task.link || [];
-                    linkCopy[i] = (e.target as HTMLInputElement).value;
-                    taskStore.task = {
-                      ...task,
-                      link: [...linkCopy]
-                    };
-                  }}
-                />
-              );
-            })}
+            {task.link &&
+              task.link.map((link, i) => {
+                return (
+                  <input
+                    class="w-full mb-2 dark:text-black"
+                    type="text"
+                    name="todo_link"
+                    placeholder="Where do I do it? Or more context?"
+                    value={link}
+                    onChange$={(e) => {
+                      const linkCopy = task.link || [];
+                      linkCopy[i] = (e.target as HTMLInputElement).value;
+                      taskStore.task = {
+                        ...task,
+                        link: [...linkCopy],
+                      };
+                    }}
+                  />
+                );
+              })}
           </divm>
         </div>
+
+        {/* Tags */}
+        <div class="grid sm:grid-cols-6 gap-5">
+          <div class="col-span-2">
+            <label for="todo_link" class="leading-10">
+              Tags
+            </label>
+            <button
+              type="button"
+              class="inline-block ml-2 border-2 border-sky-200 hover:border-sky-400 text-xs py-1 px-3"
+              onClick$={() => {
+                taskStore.task = {
+                  ...task,
+                  tags: task.tags ? [...task.tags, ...[""]] : [""],
+                };
+              }}
+            >
+              + tag
+            </button>
+          </div>
+          <divm class="col-span-4">
+            {task.tags &&
+              task.tags.map((tag, i) => {
+                return (
+                  <input
+                    class="w-full mb-2 dark:text-black"
+                    type="text"
+                    name="todo_link"
+                    placeholder="Useful tags - coworkers involved, project name, etc."
+                    value={tag}
+                    onChange$={(e) => {
+                      const tagsCopy = task.tags || [];
+                      tagsCopy[i] = (e.target as HTMLInputElement).value;
+                      taskStore.task = {
+                        ...task,
+                        tags: [...tagsCopy],
+                      };
+                    }}
+                  />
+                );
+              })}
+          </divm>
+        </div>
+
+        {/* Description */}
         <div class="text-center">
           <label for="todo_description" class="block leading-10">
             Helpful Description:
@@ -171,8 +208,12 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
               };
             }}
           ></textarea>
-          <a class="text-sm text-sky-500 hover:underline block text-left" href="https://www.markdownguide.org/basic-syntax/" target={`_blank`}>Markdown Supported</a>
+          <a class="text-sm text-sky-500 hover:underline block text-left" href="https://www.markdownguide.org/basic-syntax/" target={`_blank`}>
+            Markdown Supported
+          </a>
         </div>
+
+        {/* Create / Edit Buttons */}
         {taskStore.task.name && (
           <div class="space-x-5">
             <button
@@ -182,11 +223,8 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
               onClick$={async () => {
                 taskStore.task = {
                   ...task,
-                  link: task.link?.filter((href) => href !== ''),
-                  task_id:
-                    task.task_id && task.task_id !== ""
-                      ? task.task_id
-                      : uuidv4(),
+                  link: task.link?.filter((href) => href !== ""),
+                  task_id: task.task_id && task.task_id !== "" ? task.task_id : uuidv4(),
                 };
                 await createToDo(taskStore.task);
                 active.value = false;
@@ -194,9 +232,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
                 clearTask();
               }}
             >
-              {!todoState.editTask.name || todoState.editTask.name === ""
-                ? `Add`
-                : `Save`}
+              {!todoState.editTask.name || todoState.editTask.name === "" ? `Add` : `Save`}
             </button>
             <button
               type="submit"
