@@ -1,8 +1,9 @@
 import { component$, useContext, $, useTask$, useStore } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 
-import { Task, todoContext } from "~/state/todoContext";
+import { User } from "@supabase/supabase-js";
 
+import { Task, todoContext } from "~/state/todoContext";
 import { supabaseContext } from "~/state/supabase";
 
 import { insertTask, editTask, deleteTask, completeTask } from "~/utils/supabase";
@@ -11,7 +12,7 @@ import { insertTask, editTask, deleteTask, completeTask } from "~/utils/supabase
 import SignIn from "~/components/auth/SignIn";
 import CreateToDo from "~/components/todos/CreateToDo";
 import ToDoList from "~/components/todos/ToDoList";
-import { User } from "@supabase/supabase-js";
+import FilterSort from "~/components/filterSort/FilterSort";
 
 export default component$(() => {
   const toDoState = useContext(todoContext);
@@ -151,6 +152,7 @@ export default component$(() => {
         )}
       </div>
       <CreateToDo createToDo={createTask} />
+      <FilterSort />
       <ToDoList
         editTask={initEdit}
         copyTask={initCopy}

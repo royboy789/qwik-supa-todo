@@ -6,6 +6,7 @@ import { createClient, AuthResponse } from "@supabase/supabase-js";
 import type { Task, ToDoContext } from "~/state/todoContext";
 import { todoContext } from "~/state/todoContext";
 import { supabaseContext } from "~/state/supabase";
+import { filterContext, FilterContextProps } from "~/state/filters";
 
 import { getTasks } from "~/utils/supabase";
 
@@ -51,6 +52,7 @@ export default component$(() => {
   const taskStore : ToDoContext = useStore({
     tasks: [],
     tags: [],
+    filteredTasks: [],
     editTask: {
       name: "",
       description: "",
@@ -61,6 +63,14 @@ export default component$(() => {
       link: [],
       tags: [],
     } as Task,
+  });
+  const filtersStore: FilterContextProps = useStore({
+    taskFilter: "incomplete",
+    taskTags: [''],
+    dateRange: {
+      start: '',
+      end: '',
+    },
   });
 
   // Get All Tags
@@ -113,6 +123,7 @@ export default component$(() => {
   });
 
   useContextProvider(todoContext, taskStore);
+  useContextProvider(filterContext, filtersStore);
 
   return (
     <>

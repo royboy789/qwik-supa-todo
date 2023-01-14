@@ -1,11 +1,11 @@
-import { component$, QRL, $, useContext, useStore, useClientEffect$ } from "@builder.io/qwik";
+import { component$, QRL, $, useContext } from "@builder.io/qwik";
 import { Converter } from "showdown";
 
 import { supabaseContext } from "~/state/supabase";
 import { Task, todoContext } from "~/state/todoContext";
+import { filterContext } from "~/state/filters";
 
 import { editTask as editTaskSupa } from "~/utils/supabase";
-import { dateFilter } from "~/utils/filters";
 
 interface ToDoListProps {
   editTask: QRL<(task: Task) => Promise<Task>>;
@@ -14,70 +14,11 @@ interface ToDoListProps {
   completeTask: QRL<(task_id: string, checked: boolean) => Promise<Task>>;
 }
 
-type taskFilters = "completed" | "incomplete";
-
 const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, completeTask }) => {
   const converter = new Converter();
   const toDoState = useContext(todoContext);
   const supabase = useContext(supabaseContext);
-  const myTasks = useStore({ tasks: toDoState.tasks });
-  const filteredTasks = useStore({ tasks: toDoState.tasks });
-  const filters: { taskFilter: taskFilters; dateRange: { start: string; end: string } } = useStore({
-    taskFilter: "incomplete",
-    taskTags: [''],
-    dateRange: {
-      start: '',
-      end: '',
-    },
-  });
-
-  // Filter and Sort
-  const filterSortTasks: QRL<(tasks: Task[]) => Promise<Task[]>> = $(async (tasks) => {
-    const newTasks: { tasks: Task[] } = { tasks: [] as Task[] };
-
-    for (let i = 0; i < tasks.length; i++) {
-      switch (filters.taskFilter) {
-        case "completed":
-          const completed = tasks[i].completed && (await dateFilter(tasks[i], filters.dateRange));
-          if (tasks[i].completed && completed) {
-            newTasks.tasks = [...newTasks.tasks, tasks[i]];
-          }
-          break;
-        case "incomplete":
-          if (!tasks[i].completed) {
-            newTasks.tasks = [...newTasks.tasks, tasks[i]];
-          }
-          break;
-      }
-    }
-
-    newTasks.tasks.sort((a, b) => {
-      switch (filters.taskFilter) {
-        case "completed":
-          return (a.completed_on || 0) < (b.completed_on || 0) ? 1 : -1;
-        default:
-          return a.priority < b.priority ? -1 : 1;
-      }
-    });
-
-    return newTasks.tasks;
-  });
-
-  // set myTasks
-  useClientEffect$(async ({ track }) => {
-    track(() => toDoState.tasks);
-    myTasks.tasks = toDoState.tasks;
-    filteredTasks.tasks = await filterSortTasks(toDoState.tasks);
-  });
-
-  // sort myTasks
-  useClientEffect$(async ({ track }) => {
-    track(() => filters.taskFilter);
-    track(() => filters.dateRange);
-
-    const newTasks = await filterSortTasks([...toDoState.tasks]);
-    filteredTasks.tasks = [...newTasks];
-  });
+  const filterState = useContext(filterContext);
 
   // date completed formatting
   const dateCompleted = (date: string) => {
@@ -97,26 +38,9 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
     return daysAgo > 0 ? `${daysAgo} ${daysAgo === 1 ? `day` : `days`} ago` : `Today`;
   };
 
-  // set date range
-  const setDateRange = $((date: string, isStart: boolean) => {
-    console.log(date);
-    if (isStart) {
-      filters.dateRange = {
-        ...filters.dateRange,
-        start: date,
-      };
-      return;
-    }
-    // set end date
-    filters.dateRange = {
-      ...filters.dateRange,
-      end: date,
-    };
-  });
-
   // change task priority
   const changePriority = $(async (move: string, task: Task) => {
-    const tasksCopy = [...myTasks.tasks];
+    const tasksCopy = [...toDoState.tasks];
     const taskIndex = tasksCopy.findIndex((tsk) => tsk.task_id === task.task_id);
     const client = await supabase.client$();
 
@@ -139,72 +63,15 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
 
   return (
     <div class="tasks">
-      {myTasks.tasks.length === 0 && <div class="relative text-center text-3xl mt-10">No Tasks Yet</div>}
-
-      {/* FILTER */}
-      {myTasks.tasks.length > 0 && (
-        <div class="flex justify-center align-middle items-center my-5 relative space-x-5">
-          <span class="hidden sm:block absolute top-1/2 h-1 opacity-70 bg-gray-100 w-full -z-10"></span>
-          <button
-            onClick$={() => {
-              filters.taskFilter = "incomplete";
-            }}
-            class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium  hover:text-sky-700 ${filters.taskFilter === "incomplete" ? "text-sky-400" : "text-gray-400"}`}
-          >
-            Tasks
-          </button>
-          <button
-            onClick$={() => {
-              filters.taskFilter = "completed";
-            }}
-            class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium hover:text-sky-700 ${filters.taskFilter === "completed" ? "text-sky-400" : "text-gray-400"}`}
-          >
-            Completed Tasks
-          </button>
-        </div>
-      )}
-
-      {/* DATE RANGE */}
-      {myTasks.tasks.length > 0 && filters.taskFilter === "completed" && (
-        <div class="text-center pt-5">
-          <em>Completed Date Range</em>
-          <div class="flex flex-row align-center justify-center items-center gap-5 py-2">
-            <input
-              type="date"
-              class={`dark:text-gray-400`}
-              onChange$={(e) => {
-                setDateRange((e.target as HTMLInputElement).value, true);
-              }}
-              value={filters.dateRange.start}
-            />
-            <input
-              type="date"
-              class={`dark:text-gray-400`}
-              onChange$={(e) => {
-                setDateRange((e.target as HTMLInputElement).value, false);
-              }}
-              value={filters.dateRange.end}
-            />
-          </div>
-          <div class="text-center pb-5">
-            {(filters.dateRange.start !== "" || filters.dateRange.start !== "") && (
-              <>
-                <button class="dark:text-gray-400 hover:dark:text-gray-200" onClick$={() => (filters.dateRange = { start: "", end: "" })}>
-                  reset
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      {toDoState.tasks.length === 0 && <div class="relative text-center text-3xl mt-10">No Tasks Yet</div>}
 
       {/* NO TASKS - Filters */}
-      {myTasks.tasks.length > 0 && filteredTasks.tasks.length === 0 && <div class="relative text-center text-3xl mt-10">No tasks with your filters</div>}
+      {toDoState.tasks.length > 0 && toDoState.filteredTasks.length === 0 && <div class="relative text-center text-3xl mt-10">No tasks with your filters</div>}
 
       {/* TASKS */}
       <div>
-        {filteredTasks.tasks.length > 0 &&
-          filteredTasks.tasks.map((task) => {
+        {toDoState.filteredTasks.length > 0 &&
+          toDoState.filteredTasks.map((task) => {
             return (
               <div class={`relative sm:grid sm:grid-flow-col sm:grid-cols-12 py-5 pr-5 pl-2 hover:bg-gray-100 border-2 border-transparent dark:hover:bg-gray-900`} title={`task priority: ${task.priority}`} data-task={task.task_id}>
                 <div class="flex w-full items-center justify-center sm:justify-start">
@@ -257,20 +124,22 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
                     {task.description && <div id="task-description" class="text-gray-500 dark:text-gray-200 sm:block hidden leading-7 mb-2 max-h-48 overflow-auto" dangerouslySetInnerHTML={converter.makeHtml(task.description)}></div>}
 
                     {/* Links */}
-                    <p>
-                      {task.link &&
-                        task.link.length > 0 &&
-                        task.link.map((href) => (
+                    {task.link && task.link.length > 0 && (
+                      <p>
+                        {task.link.map((href) => (
                           <a class="inline-block mr-4 text-sky-600" href={href} target={"_blank"} title={href}>
                             Helpful Link
                           </a>
                         ))}
-                    </p>
-
+                      </p>
+                    )}
+                    
                     {/* Tags */}
                     {task.tags && (
                       <div class="flex gap-2 mt-3">
-                        {task.tags.map((tag) => <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">{tag}</span>)}
+                        {task.tags.map((tag) => (
+                          <span onClick$={() => filterState.tagFilter = tag } class="inline-flex items-center cursor-pointer rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">{tag}</span>
+                        ))}
                       </div>
                     )}
                   </div>
