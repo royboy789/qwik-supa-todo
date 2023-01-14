@@ -160,7 +160,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
                     {task.tags.map((tag) => (
                       <span
                         onClick$={() => {
-                          const newTags = task.tags.filter((tg) => tg !== tag);
+                          const newTags = task.tags?.filter((tg) => tg !== tag) || [];
                           taskStore.task = {
                             ...task,
                             tags: newTags,
@@ -185,7 +185,7 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
                     const newTag = e.target.value;
                     taskStore.task = {
                       ...task,
-                      tags: [...task.tags, newTag],
+                      tags: [...task.tags || [], newTag],
                     };
                     e.target.value = "";
                   }}
