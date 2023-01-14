@@ -44,7 +44,7 @@ export const hasTaskTag: QRL<(task: Task, tags: string[]) => boolean> = $((task,
     return false;
   }
 
-  return task.tags.some((tg) => -1 !== tags.indexOf(tg));
+  return tags.every((tg) => task.tags &&  -1 !== task.tags.indexOf(tg));
 });
 
 // Filter and Sort

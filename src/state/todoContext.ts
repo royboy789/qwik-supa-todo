@@ -3,14 +3,14 @@ import { createContext } from "@builder.io/qwik";
 export type Task = {
     name: string
     description?: string
-    link?: string[] | never[]
+    link?: string[]
     completed: boolean
     completed_on?: string
     created_on: string
     task_id: string
     user_id: string
     priority: number
-    tags?: string[] | never[]
+    tags?: string[]
 }
 
 export interface ToDoContext {
