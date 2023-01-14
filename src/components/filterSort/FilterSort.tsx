@@ -5,7 +5,7 @@ import { component$, useContext, useClientEffect$ } from "@builder.io/qwik";
 import { todoContext } from "~/state/todoContext";
 import { filterContext } from "~/state/filters";
 
-import { setDateRange, filterSortTasks } from "~/utils/filters";
+import { setDateRange, filterSortTasks, toggleTag } from "~/utils/filters";
 
 const FilterSort = component$(() => {
   const toDoState = useContext(todoContext);
@@ -23,6 +23,7 @@ const FilterSort = component$(() => {
 
   return (
     <>
+      {!toDoState.tasks.length && <div>filters loading...</div>}
       {/* FILTER */}
       {toDoState.tasks.length > 0 && (
         <div class="flex justify-center align-middle items-center my-5 relative space-x-5">
@@ -43,17 +44,24 @@ const FilterSort = component$(() => {
           >
             Completed Tasks
           </button>
-          {filterState.tagFilter && (
-            <button
-              onClick$={() => {
-                filterState.tagFilter = "";
-              }}
-              title={`Remove ${filterState.tagFilter} filter`}
-              class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium text-red-600 hover:text-sky-700`}
-            >
-              Remove Tag Filter
-            </button>
-          )}
+        </div>
+      )}
+
+      {/* TAGS */}
+      {filterState.tagFilter && filterState.tagFilter.length > 0 && (
+        <div class={`flex items-center justify-center gap-x-3`}>
+          <span>Filtered By: </span>
+          {filterState.tagFilter.map((tag) => (
+            <span class={`inline-flex items-center rounded-full bg-indigo-100 py-0.5 pl-2.5 pr-1 text-sm font-medium text-indigo-700`}>
+              {tag}
+              <button onClick$={async() => filterState.tagFilter = await toggleTag(filterState.tagFilter || [], tag)} type="button" class="ml-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:bg-indigo-500 focus:text-white focus:outline-none">
+                <span class="sr-only">Remove {tag}</span>
+                <svg class="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
+                  <path stroke-linecap="round" stroke-width="1.5" d="M1 1l6 6m0-6L1 7" />
+                </svg>
+              </button>
+            </span>
+          ))}
         </div>
       )}
 

@@ -4,7 +4,7 @@ type taskFilters = "completed" | "incomplete";
 
 export interface FilterContextProps { 
   taskFilter: taskFilters;
-  tagFilter?: string;
+  tagFilter?: string[];
   dateRange: { 
     start: string; 
     end: string 

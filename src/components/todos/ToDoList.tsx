@@ -6,6 +6,7 @@ import { Task, todoContext } from "~/state/todoContext";
 import { filterContext } from "~/state/filters";
 
 import { editTask as editTaskSupa } from "~/utils/supabase";
+import { toggleTag } from "~/utils/filters";
 
 interface ToDoListProps {
   editTask: QRL<(task: Task) => Promise<Task>>;
@@ -74,18 +75,18 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
           toDoState.filteredTasks.map((task) => {
             return (
               <div class={`relative sm:grid sm:grid-flow-col sm:grid-cols-12 py-5 pr-5 pl-2 hover:bg-gray-100 border-2 border-transparent dark:hover:bg-gray-900`} title={`task priority: ${task.priority}`} data-task={task.task_id}>
-                <div class="flex w-full items-center justify-center sm:justify-start">
-                  <button title="make task a higher priority" onClick$={() => changePriority("up", task)}>
+                <div class="col-span-2 flex flex-row justify-center align-middle items-center">
+                  <button title="make task a higher priority" onClick$={() => changePriority("up", task)} class="flex">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l7.5-7.5 7.5 7.5m-15 6l7.5-7.5 7.5 7.5" />
                     </svg>
                   </button>
-                  <button title="make task a lower priority" onClick$={() => changePriority("down", task)}>
+                  <button title="make task a lower priority" onClick$={() => changePriority("down", task)} class="flex">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.25l-7.5 7.5-7.5-7.5m15 6l-7.5 7.5-7.5-7.5" />
                     </svg>
                   </button>
-                  <div class="h-full flex items-center justify-center ml-3">
+                  <div class="flex ml-3">
                     <input
                       id={`task-${task.task_id}`}
                       aria-describedby="comments-description"
@@ -99,7 +100,7 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
                     />
                   </div>
                 </div>
-                <div class="col-span-9 px-5 pt-5 sm:pt-0 text-sm flex gap-5 text-center sm:text-left">
+                <div class="col-span-8 px-5 pt-5 sm:pt-0 text-sm flex gap-5 text-center sm:text-left">
                   <div class="flex-grow flex justify-center flex-col">
                     {/* Name */}
                     <label for={`task-${task.task_id}`} class={`text-xl font-medium cursor-pointer ${task.priority < 3 ? `text-orange-500 dark:text-orange-500` : `text-gray-700 dark:text-gray-200`}`}>
@@ -138,7 +139,7 @@ const ToDoList = component$<ToDoListProps>(({ editTask, copyTask, deleteTask, co
                     {task.tags && (
                       <div class="flex gap-2 mt-3">
                         {task.tags.map((tag) => (
-                          <span onClick$={() => filterState.tagFilter = tag } class="inline-flex items-center cursor-pointer rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">{tag}</span>
+                          <span onClick$={async () => filterState.tagFilter = await toggleTag(filterState.tagFilter || [], tag) } class="inline-flex items-center cursor-pointer rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">{tag}</span>
                         ))}
                       </div>
                     )}
