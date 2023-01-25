@@ -5,6 +5,7 @@ import type { Task } from "~/state/todoContext";
 import { todoContext } from "~/state/todoContext";
 
 // Components
+import AutoComplete from "../autocomplete/AutoComplete";
 
 interface CreateToDoProps {
   createToDo: QRL<(task: Task) => Promise<Task>>;
@@ -156,39 +157,45 @@ const CreateToDo = component$<CreateToDoProps>(({ createToDo }) => {
                   Tags
                 </label>
                 {task.tags && task.tags.length > 0 && (
-                  <div class="flex space-x-2">
+                  <div class="flex flex-col space-y-2 align-middle justify-start items-start">
                     {task.tags.map((tag) => (
-                      <span
-                        onClick$={() => {
-                          const newTags = task.tags?.filter((tg) => tg !== tag) || [];
-                          taskStore.task = {
-                            ...task,
-                            tags: newTags,
-                          };
-                        }}
-                        class="inline-flex cursor-pointer items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 hover:bg-red-400 hover:text-white"
-                      >
-                        {tag}
-                      </span>
+                      <div>
+                        <span class="inline-flex items-center rounded-full bg-white py-0.5 pl-2.5 pr-1 text-sm font-medium text-black">
+                          {tag}
+                          <button
+                            onClick$={() => {
+                              const newTags = task.tags?.filter((tg) => tg !== tag) || [];
+                              taskStore.task = {
+                                ...task,
+                                tags: newTags,
+                              };
+                            }}
+                            type="button"
+                            class="ml-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-black hover:bg-red-400 hover:text-white focus:bg-sky-500 focus:text-white focus:outline-none"
+                          >
+                            <span class="sr-only">Remove {tag}</span>
+                            <svg class="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
+                              <path stroke-linecap="round" stroke-width="1.5" d="M1 1l6 6m0-6L1 7" />
+                            </svg>
+                          </button>
+                        </span>
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
-              <divm class="col-span-4">
-                <input
-                  class="w-full mb-2 dark:text-black"
-                  type="text"
-                  name="todo_link"
-                  placeholder="Useful tags - coworkers involved, project name, etc."
-                  value={""}
-                  onChange$={(e) => {
-                    const newTag = e.target.value;
-                    taskStore.task = {
-                      ...task,
-                      tags: [...task.tags || [], newTag],
-                    };
-                    e.target.value = "";
-                  }}
+              <divm class="col-span-4 dark:text-black">
+                <AutoComplete
+                  placeholder="Taask Tags"
+                  options={todoState.tags}
+                  onSelect$={$((value: string) => {
+                    if (-1 === taskStore.task.tags.indexOf(value)) {
+                      taskStore.task = {
+                        ...task,
+                        tags: [...(task.tags || []), value],
+                      };
+                    }
+                  })}
                 />
               </divm>
             </div>

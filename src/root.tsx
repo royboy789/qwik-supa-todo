@@ -29,12 +29,16 @@ export default component$(() => {
       return;
     }
 
-    const localStoreSession = JSON.parse(window.localStorage.getItem('sb-cxwhwqmnanjazcbtuiis-auth-token') || '{}');
-    if( localStoreSession.access_token && localStoreSession.refresh_token ) {
-      document.cookie = `access_token=${localStoreSession.access_token}`;
-      document.cookie = `refresh_token=${localStoreSession.refresh_token}`;
+    // find local store sb- key
+    const localStoreKey = Object.keys(window.localStorage).find((key) => 0 === key.indexOf('sb-'));
+    if(localStoreKey) {
+      const localStoreSession = JSON.parse(window.localStorage.getItem(localStoreKey) || '{}');    
+      if( localStoreSession.access_token && localStoreSession.refresh_token ) {
+        document.cookie = `access_token=${localStoreSession.access_token}`;
+        document.cookie = `refresh_token=${localStoreSession.refresh_token}`;
+      }
     }
-    
+        
     // get session from supa
     const { data: userSession, error } = await client.auth.getSession();
     if( error ) {
@@ -44,12 +48,26 @@ export default component$(() => {
     // set user
     if(userSession.session) {
       supaContext.user = userSession.session.user;
-      if('' === localStoreSession.access_token || !localStoreSession.access_token ) {
-        document.cookie = `access_token=${userSession.session.access_token}`;
-        document.cookie = `refresh_token=${userSession.session.refresh_token}`;
-      }
     } else {
-      console.log('not logged in');
+      // if no user, but session data in local store
+      if(localStoreKey) {
+        const localStoreSession = JSON.parse(window.localStorage.getItem(localStoreKey) || '{}');    
+        const{ data, error } = await client.auth.setSession({
+          access_token: localStoreSession.access_token,
+          refresh_token: localStoreSession.refresh_token
+        });
+
+        if(error) {
+          console.error(error.message);
+        }
+
+        if(data.session && data.session.user) {
+          supaContext.user = data.session.user;  
+        }
+        console.log('not logged in');
+      } else {
+        console.log('not logged in');
+      }
     }
   })
 

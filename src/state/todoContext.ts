@@ -10,7 +10,7 @@ export type Task = {
     task_id: string
     user_id: string
     priority: number
-    tags?: string[]
+    tags: string[]
 }
 
 export interface ToDoContext {

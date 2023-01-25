@@ -62,6 +62,7 @@ export default component$(() => {
       user_id: "",
       link: [],
       tags: [],
+      priority: 0,
     } as Task,
   });
   const filtersStore: FilterContextProps = useStore({
