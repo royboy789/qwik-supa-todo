@@ -1,6 +1,6 @@
 import { createContext } from "@builder.io/qwik";
 
-type taskFilters = "completed" | "incomplete";
+type taskFilters = "completed" | "incomplete" | "all";
 
 export interface FilterContextProps { 
   taskFilter: taskFilters;
