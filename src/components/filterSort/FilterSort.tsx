@@ -48,7 +48,7 @@ const FilterSort = component$(() => {
             onClick$={() => {
               filterState.taskFilter = "all";
             }}
-            class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium hover:text-sky-700 ${filterState.taskFilter === "completed" ? "text-sky-400" : "text-gray-400"}`}
+            class={`z-10 bg-gray-900 py-3 px-5 inline-flex items-center text-md font-medium hover:text-sky-700 ${filterState.taskFilter === "all" ? "text-sky-400" : "text-gray-400"}`}
           >
             All Tasks
           </button>
