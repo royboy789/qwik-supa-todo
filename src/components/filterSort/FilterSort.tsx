@@ -55,14 +55,14 @@ const FilterSort = component$(() => {
         </div>
       )}
 
-      <div class={`flex`}>
+      <div class={`grid grid-cols-2 pb-10 mb-5 border-b-2 border-gray-100`} style="grid-template-columns:60% 40%">
         {/* TAGS */}
         {toDoState.tags.length > 0 && (
           <div class={`grid grid-cols-4 items-center`}>
             {toDoState.tags.map((tag) => {
               const isActive = filterState.tagFilter && filterState.tagFilter.length > 0 && filterState.tagFilter.some((tg) => tg === tag);
               return (
-                <span class={`inline-block text-center py-2 mx-2 rounded-full bg-indigo-100 text-indigo-700 cursor-pointer ${isActive ? `bg-indigo-700 text-indigo-100` : ``}`} onClick$={async () => (filterState.tagFilter = await toggleTag(filterState.tagFilter || [], tag))}>
+                <span class={`inline-block text-center text-md py-2 px-4 m-2 rounded-full bg-indigo-100 text-indigo-700 cursor-pointer ${isActive && `bg-indigo-700 text-indigo-100`} hover:bg-indigo-700 hover:text-indigo-100`} onClick$={async () => (filterState.tagFilter = await toggleTag(filterState.tagFilter || [], tag))}>
                   {tag}
                 </span>
               )
@@ -77,7 +77,7 @@ const FilterSort = component$(() => {
             <div class="flex flex-col align-center justify-center items-center gap-5">
               <input
                 type="date"
-                class={`dark:text-gray-400`}
+                class={`dark:text-gray-400 w-1/2`}
                 onChange$={async (e) => {
                   filterState.dateRange = await setDateRange((e.target as HTMLInputElement).value, true, filterState.dateRange);
                 }}
@@ -85,7 +85,7 @@ const FilterSort = component$(() => {
               />
               <input
                 type="date"
-                class={`dark:text-gray-400`}
+                class={`dark:text-gray-400 w-1/2`}
                 onChange$={async (e) => {
                   filterState.dateRange = await setDateRange((e.target as HTMLInputElement).value, false, filterState.dateRange);
                 }}
