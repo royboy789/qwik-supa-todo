@@ -23,7 +23,6 @@ const FilterSort = component$(() => {
 
   return (
     <>
-      {!toDoState.tasks.length && <div>filters loading...</div>}
       {/* FILTER */}
       {toDoState.tasks.length > 0 && (
         <div class="flex justify-center align-middle items-center my-5 relative space-x-5">
@@ -58,7 +57,7 @@ const FilterSort = component$(() => {
       <div class={`grid grid-cols-2 pb-10 mb-5 border-b-2 border-gray-100`} style="grid-template-columns:60% 40%">
         {/* TAGS */}
         {toDoState.tags.length > 0 && (
-          <div class={`grid grid-cols-4 items-center`}>
+          <div class={`grid grid-cols-4 items-center max-h-44 overflow-auto`}>
             {toDoState.tags.map((tag) => {
               const isActive = filterState.tagFilter && filterState.tagFilter.length > 0 && filterState.tagFilter.some((tg) => tg === tag);
               return (

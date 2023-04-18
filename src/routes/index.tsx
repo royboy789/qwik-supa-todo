@@ -152,13 +152,13 @@ export default component$(() => {
         )}
       </div>
       <CreateToDo createToDo={createTask} />
-      <FilterSort />
       <ToDoList
         editTask={initEdit}
         copyTask={initCopy}
         deleteTask={initDelete}
         completeTask={completeTaskInit}
       />
+      <FilterSort />
     </div>
   );
 });
